@@ -19,3 +19,7 @@ out/
 
 # Vercel
 .vercel
+
+# Operational scripts (one-off utilities)
+check-emails.mjs
+delete-ghost-contact.mjs

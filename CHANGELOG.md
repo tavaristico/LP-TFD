@@ -62,4 +62,30 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 - Remetente `diario@melfiore.com` verificado (SPF/DKIM/DMARC)
 - Integração Brevo 100% funcional
 
-**Produto completo. Nenhuma pendência crítica em aberto.**
+---
+
+## [1.2.1] · 2026-06-04
+
+### Corrigido
+- Bug: campo `NOME` não era salvo na Brevo — `attributes` usava `FIRSTNAME` (campo inexistente na conta). Corrigido para `NOME`. Commit `10259f0` · branch `main`
+
+### Operacional
+- Contato fantasma (ID 2, "Welcome Bot", sem e-mail) deletado via MCP Brevo
+- MCP Brevo configurado em `~/.claude.json` — Claude acessa a Brevo diretamente sem scripts
+
+### Status
+- 8 contatos reais na lista, todos com e-mail de confirmação entregue
+- Campo NOME em branco nos cadastros anteriores ao fix (esperado — não retroativo)
+
+**Produto estável em produção.**
+
+---
+
+## [1.2.2] · 2026-06-06
+
+### Operacional
+- Repo tornado **público** no GitHub — resolve bloqueio de deploy no Vercel Hobby (plano gratuito não suporta colaboração em repos privados)
+- Co-Authored-By removido dos commits — Vercel parseia co-autores e bloqueia quando não encontra conta GitHub
+- Fix NOME (`10259f0`) confirmado em produção — campo NOME salva corretamente na Brevo ✅
+
+**Fase 1 encerrada. Site 100% funcional.**
