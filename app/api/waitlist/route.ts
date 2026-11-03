@@ -103,7 +103,11 @@ export async function POST(req: NextRequest) {
     // Brevo integration (only runs if env vars are set)
     if (process.env.BREVO_API_KEY) {
       await addBrevoContact(name, email)
-      if (podeEnviarEmail('waitlist:boas-vindas')) await sendBrevoWelcomeEmail(name, email)
+      // Boas-vindas falhar não derruba o cadastro: o contato já está na lista.
+      if (podeEnviarEmail('waitlist:boas-vindas')) {
+        await sendBrevoWelcomeEmail(name, email).catch((e) =>
+          console.error('[waitlist] boas-vindas falhou (cadastro mantido):', e))
+      }
     } else {
       // Dev mode: log only
       console.log('[waitlist:dev] lead capturado:', { name, email })
