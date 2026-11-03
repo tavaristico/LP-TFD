@@ -23,3 +23,8 @@ out/
 # Operational scripts (one-off utilities)
 check-emails.mjs
 delete-ghost-contact.mjs
+
+# cloudflare
+.open-next
+.dev.vars
+.wrangler

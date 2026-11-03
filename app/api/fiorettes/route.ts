@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { podeEnviarEmail } from '@/lib/trava-email'
 
 const attempts = new Map<string, { count: number; reset: number }>()
 
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const id = randomId()
 
-    if (process.env.BREVO_API_KEY) {
+    if (process.env.BREVO_API_KEY && podeEnviarEmail('fiorettes:aviso')) {
       await sendNotification({ id, assinatura, titulo, historia, cidade })
     } else {
       console.log('[fiorettes:dev] nova página:', { id, assinatura, titulo, historia, cidade })
