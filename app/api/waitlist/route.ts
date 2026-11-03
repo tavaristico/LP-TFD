@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { podeEnviarEmail } from '@/lib/trava-email'
 
 // In-memory rate limiter (resets on redeploy — adequate for landing page scale)
 const attempts = new Map<string, { count: number; reset: number }>()
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
     // Brevo integration (only runs if env vars are set)
     if (process.env.BREVO_API_KEY) {
       await addBrevoContact(name, email)
-      await sendBrevoWelcomeEmail(name, email)
+      if (podeEnviarEmail('waitlist:boas-vindas')) await sendBrevoWelcomeEmail(name, email)
     } else {
       // Dev mode: log only
       console.log('[waitlist:dev] lead capturado:', { name, email })
