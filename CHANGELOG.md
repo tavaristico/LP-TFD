@@ -5,6 +5,14 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+
+## 03/11/2026: melfiore.com na Cloudflare
+
+- Build para Cloudflare Workers via OpenNext (`wrangler.jsonc`, `open-next.config.ts`, scripts `cf:*`).
+- melfiore.com e www servidos pelo Worker `melfiore` desde ~15h45. Registros da Vercel anotados em `_SHARED/INFRA/dns/melfiore.com.zone` para volta atrás.
+- Trava de e-mail: `lib/trava-email.ts` + `scripts/trava-email.mjs` no `prebuild`. Boas-vindas da lista e aviso das Fiorettes desligados até pedido do fundador.
+- Endereço de teste: https://melfiore.melfiore-waitlist.workers.dev
+
 ## [1.1.0] · 2026-05-31
 
 ### Alterado

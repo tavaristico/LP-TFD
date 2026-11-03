@@ -4,15 +4,17 @@
 
 ## Stack e comandos
 
-- Next.js 15 + Tailwind 3 + Brevo (e-mail transacional) · deploy Vercel
-- `npm run dev` · antes de commitar: `npm run build`
+- Next.js 15 + Tailwind 3 + Brevo (e-mail transacional) · **produção na Cloudflare** (Worker `melfiore`, OpenNext) desde 03/11/2026
+- `npm run dev` · antes de commitar: `npm run build` · prévia no motor da Cloudflare: `npm run cf:preview`
+- Publicar: **só pela skill `/deploy`** (roda `npm run cf:deploy`). `cf:deploy` avulso é bloqueado pelo `tbf-main-guard`.
+- 🔴 **Trava de e-mail** (fundador, 03/11/2026): todo envio passa por `podeEnviarEmail()` em `lib/trava-email.ts` e só sai com `EMAIL_ENVIO=ligado`. Hoje está `desligado` em `wrangler.jsonc`. Ligar exige pedido dele. `scripts/trava-email.mjs` reprova o build se um envio escapar.
 
 ## Branches e deploy
 
 | Branch | Uso |
 |---|---|
 | `develop` | Trabalho. Todo desenvolvimento começa e fica aqui. |
-| `main` | Produção. Push dispara deploy automático na Vercel (conta `thefioredaily@gmail.com`). |
+| `main` | Produção (fonte da verdade). O `/deploy` sobe `develop:main` e publica na Cloudflare. A Vercel ainda builda `main`, mas não serve mais o domínio (volta atrás até 09/11). |
 
 - **Nunca** merge/push para `main` sem aprovação explícita do usuário
 - **NUNCA adicionar `Co-Authored-By` em commits deste repo**: o Vercel Hobby bloqueia o deploy quando o co-autor não tem conta GitHub reconhecida. (espelhada de `_SHARED/INFRA/accounts.md`)
