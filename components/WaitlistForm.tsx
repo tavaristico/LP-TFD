@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { TarjaSvg } from './TarjaSvg'
+import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
 
 type FormState  = { name: string; email: string }
 type FormErrors = { name?: string; email?: string; server?: string }
@@ -150,6 +151,14 @@ export default function WaitlistForm() {
           {loading ? 'aguarde...' : 'cadastrar'}
         </button>
       </div>
+
+      {/* Aceite (prova gravada em lib/aceite-waitlist.ts) */}
+      <p
+        className="text-center"
+        style={{ color: '#AAAAAA', fontSize: '11px', fontWeight: 300, letterSpacing: '0.04em', lineHeight: 1.5 }}
+      >
+        {ACEITE_WAITLIST.texto}
+      </p>
 
       {/* Who is MELFIORE */}
       <a

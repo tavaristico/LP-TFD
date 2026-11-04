@@ -6,6 +6,12 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 ---
 
 
+## 04/11/2026: aceite visivel e versionado na waitlist
+
+- `lib/aceite-waitlist.ts`: texto e versao (`waitlist-2026-11-04`) em fonte unica. O form exibe, `lib/crm-captura.ts` grava o mesmo texto em `crm.consentimentos`.
+- `components/WaitlistForm.tsx`: linha de aceite sob o botao, cor #AAAAAA, peso 300, contraste 9:1 sobre o preto.
+
+
 ## 04/11/2026: contato unico na inscricao (2A.3), desligado
 
 - `app/api/waitlist/route.ts`: com `CRM_ENVIO=ligado`, grava no Supabase (schema crm, uma transacao: contato, captura, consentimento, eventos) ANTES do Brevo. Sem a flag, o comportamento e identico ao anterior. Falha do Supabase vai ao log (`crm.pendente`) e o Brevo segue.

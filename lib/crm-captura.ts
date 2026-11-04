@@ -3,15 +3,16 @@
 // Nunca lanca: falha do Supabase vira log estruturado e a inscricao segue para o Brevo.
 import { capturarComSupabase } from '@/lib/crm'
 import type { EntradaCaptura } from '@/lib/crm'
+import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
 
 export function crmLigado(): boolean {
   return process.env.CRM_ENVIO === 'ligado'
 }
 
-// Texto exato do aceite gravado em crm.consentimentos. A versao muda se o formulario mudar.
+// Texto exato do aceite gravado em crm.consentimentos: o mesmo que o form exibe (lib/aceite-waitlist.ts).
 const WAITLIST_ACEITE = {
-  texto_versao: 'waitlist-2026-11-03',
-  texto_aceito: 'cadastro na lista de espera da melfiore pelo formulario de nome e e-mail (botao cadastrar)',
+  texto_versao: ACEITE_WAITLIST.versao,
+  texto_aceito: ACEITE_WAITLIST.texto,
 }
 
 async function hashIp(ip: string): Promise<string | undefined> {
