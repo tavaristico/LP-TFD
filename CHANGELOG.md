@@ -6,6 +6,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 ---
 
 
+## 04/11/2026: contato unico na inscricao (2A.3), desligado
+
+- `app/api/waitlist/route.ts`: com `CRM_ENVIO=ligado`, grava no Supabase (schema crm, uma transacao: contato, captura, consentimento, eventos) ANTES do Brevo. Sem a flag, o comportamento e identico ao anterior. Falha do Supabase vai ao log (`crm.pendente`) e o Brevo segue.
+- `lib/crm/` e copia vendorizada de `MELFIORE-SITE/packages/crm` (`node scripts/sincronizar-crm.mjs`). `lib/crm-captura.ts` e a ponte da route. Dependencia nova: `libphonenumber-js`.
+- Variaveis para ligar (nenhuma esta em producao): `CRM_ENVIO`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, opcional `CRM_IP_SALT`.
+- `/api/fiorettes` nao captura contato (so a pagina anonima): nada a ligar la.
+
 ## 03/11/2026: melfiore.com na Cloudflare
 
 - Build para Cloudflare Workers via OpenNext (`wrangler.jsonc`, `open-next.config.ts`, scripts `cf:*`).
