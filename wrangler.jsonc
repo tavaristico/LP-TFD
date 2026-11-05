@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "melfiore",
-  "main": ".open-next/worker.js",
+  "main": "custom-worker.ts", // handler do OpenNext + cron da fila (lib/fila-agendada.ts)
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
@@ -18,6 +18,9 @@
   // Fila de reenvio da captura. Namespace ainda NAO criado: sem ele o site segue como hoje e o log avisa.
   // Criar (a pedido do fundador): npx wrangler kv namespace create CAPTURA_FILA, depois colar o id aqui.
   // "kv_namespaces": [{ "binding": "CAPTURA_FILA", "id": "<id do namespace>" }],
+  // Cron que esvazia a fila sem depender de nova inscricao (custom-worker.ts, scheduled). Ligar JUNTO com o KV
+  // e com CRM_ENVIO=ligado, a pedido do fundador. Sem o KV ou com a flag desligada, o cron so registra no log e sai.
+  // "triggers": { "crons": ["*/5 * * * *"] },
   "routes": [
     { "pattern": "melfiore.com", "custom_domain": true },
     { "pattern": "www.melfiore.com", "custom_domain": true }

@@ -138,3 +138,39 @@ export async function capturarWaitlistNoCrm(
     log('error', 'crm.pendente', { origem: 'waitlist', codigo: 'inesperado' })
   }
 }
+
+export interface ResultadoEsvaziar {
+  estado: 'desligado' | 'sem_config' | 'sem_fila' | 'ok'
+  reenviados: number
+  restantes: number
+}
+
+/**
+ * Esvazia a fila de reenvio sem depender de nova inscricao (chamada pelo cron do Worker).
+ * Mesmas regras da captura: so roda com CRM_ENVIO=ligado, com o JWT captura_web, nunca com service_role.
+ * Item que entrou (gravado, duplicado ou recusado de vez) sai; o que falhou volta com a contagem.
+ */
+export async function esvaziarFilaCaptura(
+  env: Record<string, unknown>,
+  deps: { fila: KvFila | null; capturar?: typeof capturarComSupabase; tetoMs?: number; max?: number },
+): Promise<ResultadoEsvaziar> {
+  const texto = (k: string): string | undefined => (typeof env[k] === 'string' ? (env[k] as string) : undefined)
+  if (texto('CRM_ENVIO') !== 'ligado') return { estado: 'desligado', reenviados: 0, restantes: 0 }
+  const url = texto('SUPABASE_URL')
+  const chave = texto('SUPABASE_CAPTURA_JWT')
+  const apikey = texto('SUPABASE_PUBLISHABLE_KEY')
+  if (!url || !chave || !apikey) {
+    log('error', 'crm.sem_config', { origem: 'fila_agendada' })
+    return { estado: 'sem_config', reenviados: 0, restantes: 0 }
+  }
+  if (!deps.fila) {
+    log('error', 'crm.fila_sem_binding', { origem: 'fila_agendada' })
+    return { estado: 'sem_fila', reenviados: 0, restantes: 0 }
+  }
+  const d = { capturar: deps.capturar ?? capturarComSupabase, tetoMs: deps.tetoMs ?? TETO_MS }
+  const acesso: Acesso = { url, chave, apikey }
+  const reenviar = async (it: ItemFila): Promise<Reenvio> => ((await tentar(it, d, acesso)).estado === 'ok' ? 'ok' : 'falhou')
+  const r = await drenar(deps.fila, reenviar, deps.max ?? 25)
+  log('info', 'crm.fila_agendada', { reenviados: r.reenviados, restantes: r.restantes })
+  return { estado: 'ok', ...r }
+}

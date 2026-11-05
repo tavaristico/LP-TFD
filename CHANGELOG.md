@@ -10,6 +10,7 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 - `lib/crm-captura.ts`: uma chamada so, `crm.capturar` (o banco decide gemeo e captura repetida). `apikey` leva a chave publishable (`SUPABASE_PUBLISHABLE_KEY`) e o JWT `captura_web` vai em `Authorization: Bearer`: o gateway recusa JWT customizado no `apikey` (401, testado no staging). Resolve o bloqueio da entrada anterior.
 - Aceite: o pacote recebe `forma: aviso_e_clique` no lugar de `marcado`. `lib/crm/` ressincronizada.
 - `.env.example`: `SUPABASE_PUBLISHABLE_KEY` entra. `CRM_ENVIO` segue desligada.
+- Fila agendada: `custom-worker.ts` (novo `main` do `wrangler.jsonc`) embrulha o handler do OpenNext e acrescenta `scheduled`, que chama `lib/fila-agendada.ts` e esvazia a fila (ate 25 itens por rodada) sem depender de nova inscricao. Trigger `cron` (`*/5 * * * *`) COMENTADO em `wrangler.jsonc`, junto com o KV: ligar os dois e `CRM_ENVIO` so a pedido do fundador. Sem flag, sem KV ou sem chave o cron registra e sai. `wrangler deploy --dry-run` empacota (default com `fetch` e `scheduled`, DOs exportados); nada foi publicado. `tests/fila-agendada.test.ts`: 9 testes.
 
 
 ## 05/11/2026: aceite verdadeiro, chave restrita e fila de reenvio (auditoria P1, P2, P3)
