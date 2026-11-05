@@ -68,7 +68,8 @@ describe('captura com chave restrita', () => {
     await rodar(capturar, kvFalso()).esperar()
     const e = capturar.mock.calls[0][0]
     expect(e.ocorrido_em).toBe('2026-11-05T15:30:10.000Z')
-    expect(e.consentimentos[0]).toMatchObject({ texto_versao: ACEITE_WAITLIST.versao, texto_aceito: ACEITE_WAITLIST.texto })
+    expect(e.consentimentos[0]).toMatchObject({ forma: 'aviso_e_clique', texto_versao: ACEITE_WAITLIST.versao, texto_aceito: ACEITE_WAITLIST.texto })
+    expect(e.consentimentos[0]).not.toHaveProperty('marcado')
   })
   it('sem versao do aviso: entra sem consentimento', async () => {
     const capturar = vi.fn().mockResolvedValue(gravada)
@@ -182,6 +183,8 @@ describe('ponta a ponta com o pacote real e fetch falso', () => {
     expect(rpc.auth).toBe('Bearer jwt-de-teste')
     expect(rpc.apikey).toBe('sb_publishable_teste')
     expect(rpc.corpo).toContain(ACEITE_WAITLIST.texto)
+    expect(rpc.corpo).toContain('"forma":"aviso_e_clique"')
+    expect(rpc.corpo).not.toContain('marcado')
     expect(rpc.corpo).toContain('"ocorrido_em":"2026-11-05T15:30:10.000Z"')
   })
 

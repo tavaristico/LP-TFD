@@ -38,6 +38,7 @@ export type Recusa =
   | 'whatsapp_invalido'
   | 'consentimento_sem_texto'
   | 'avise_me_sem_produto'
+  | 'aceite_na_waitlist_antiga'
 
 export type Pendencia =
   | { tipo: 'brevo'; contato_id: string; payload: PayloadBrevo; erro: string }
@@ -63,7 +64,7 @@ export type ResultadoCaptura =
     }
 
 const ORIGENS: readonly OrigemBase[] = [
-  'waitlist', 'fiorettes', 'captura', 'avise-me', 'checkout', 'conta', 'newsletter', 'direct', 'crm',
+  'waitlist', 'waitlist_antiga', 'fiorettes', 'captura', 'avise-me', 'checkout', 'conta', 'newsletter', 'direct', 'crm',
 ]
 
 function validarOrigem(origem: string): { base: OrigemBase; tela: string | null } | null {
@@ -75,7 +76,7 @@ function validarOrigem(origem: string): { base: OrigemBase; tela: string | null 
 }
 
 export function origemDoEvento(base: OrigemBase): Evento['origem'] {
-  if (base === 'waitlist') return 'waitlist'
+  if (base === 'waitlist' || base === 'waitlist_antiga') return 'waitlist'
   if (base === 'crm') return 'crm'
   if (base === 'direct') return 'admin'
   if (base === 'checkout') return 'medusa'
@@ -141,9 +142,14 @@ export function prepararCaptura(entrada: EntradaCaptura, agora: Date): { ok: fal
 
   const consents = entrada.consentimentos ?? []
   for (const c of consents) {
-    if ((c.marcado || c.revogar === true) && (vazio(c.texto_aceito) || vazio(c.texto_versao))) {
+    if ((c.forma !== undefined || c.revogar === true) && (vazio(c.texto_aceito) || vazio(c.texto_versao))) {
       return { ok: false, motivo: 'consentimento_sem_texto' }
     }
+  }
+
+  // Os 100 de antes nunca viram o aviso: nenhum aceite entra por esta origem, nem com a data de inscricao.
+  if (origem.base === 'waitlist_antiga' && consents.some((c) => c.forma !== undefined)) {
+    return { ok: false, motivo: 'aceite_na_waitlist_antiga' }
   }
 
   const ocorrido = entrada.ocorrido_em ? new Date(entrada.ocorrido_em) : agora
@@ -297,10 +303,10 @@ export async function capturarContato(entrada: EntradaCaptura, portas: Portas): 
     let estado: Consentimento['estado'] | null = null
     if (c.revogar === true) {
       if (vigente?.estado === 'concedido') estado = 'revogado'
-    } else if (c.marcado) {
+    } else if (c.forma !== undefined) {
       if (!(vigente?.estado === 'concedido' && vigente.texto_versao === c.texto_versao)) estado = 'concedido'
     }
-    // Caixa desmarcada sem revogar: nao gera registro nenhum.
+    // Sem forma e sem revogar: nao ha aceite, nao gera registro nenhum.
     if (estado === null) continue
     const registro: Consentimento = {
       contato_id: contato.id,
@@ -309,6 +315,7 @@ export async function capturarContato(entrada: EntradaCaptura, portas: Portas): 
       estado,
       texto_versao: c.texto_versao,
       texto_aceito: c.texto_aceito,
+      forma: estado === 'concedido' ? (c.forma ?? null) : null,
       origem: entrada.origem,
       ip_hash: entrada.ip_hash ?? null,
       ocorrido_em: ocorridoIso,

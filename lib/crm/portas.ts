@@ -6,6 +6,8 @@ import type { Evento } from './eventos-tipos'
 
 export type OrigemBase =
   | 'waitlist'
+  /** Os 100 contatos de antes do aviso de aceite (decisao do fundador, 05/11/2026): entram sem consentimento. */
+  | 'waitlist_antiga'
   | 'fiorettes'
   | 'captura'
   | 'avise-me'
@@ -39,6 +41,9 @@ export interface Contato {
 }
 
 /** So acrescimo. O estado vigente e o ultimo registro por contato, canal e finalidade. */
+/** Como o aceite aconteceu. Uma forma por registro; nova forma exige migration (ver crm.consentimentos.forma). */
+export type FormaAceite = 'aviso_e_clique'
+
 export interface Consentimento {
   contato_id: string
   canal: Canal
@@ -46,6 +51,8 @@ export interface Consentimento {
   estado: 'concedido' | 'revogado'
   texto_versao: string
   texto_aceito: string
+  /** Como o aceite aconteceu. Nulo em revogacao. */
+  forma: FormaAceite | null
   origem: string
   ip_hash: string | null
   ocorrido_em: string
@@ -82,9 +89,12 @@ export interface Conflito {
 export interface ConsentimentoEntrada {
   canal: Canal
   finalidade: Finalidade
-  /** Caixa marcada. Desmarcada nunca gera consentimento. */
-  marcado: boolean
-  /** Texto exato mostrado e aceito. Obrigatorio quando marcado ou revogar. */
+  /**
+   * Como o aceite aconteceu (`aviso_e_clique`: aviso a vista, clique no botao). Presente = o ato de aceite
+   * aconteceu. Ausente (e sem `revogar`) = nao ha aceite e nada e gravado.
+   */
+  forma?: FormaAceite
+  /** Texto exato mostrado e aceito. Obrigatorio quando ha forma ou revogar. */
   texto_aceito: string
   texto_versao: string
   /** Revogacao explicita (clique em /conta ou no rodape). Caixa vazia sozinha nao revoga. */

@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 05/11/2026 (noite): captura com papel restrito, forma do aceite e fila agendada (Fase 2A, nada em producao)
+
+- `lib/crm-captura.ts`: uma chamada so, `crm.capturar` (o banco decide gemeo e captura repetida). `apikey` leva a chave publishable (`SUPABASE_PUBLISHABLE_KEY`) e o JWT `captura_web` vai em `Authorization: Bearer`: o gateway recusa JWT customizado no `apikey` (401, testado no staging). Resolve o bloqueio da entrada anterior.
+- Aceite: o pacote recebe `forma: aviso_e_clique` no lugar de `marcado`. `lib/crm/` ressincronizada.
+- `.env.example`: `SUPABASE_PUBLISHABLE_KEY` entra. `CRM_ENVIO` segue desligada.
+
+
 ## 05/11/2026: aceite verdadeiro, chave restrita e fila de reenvio (auditoria P1, P2, P3)
 
 - `lib/aceite-waitlist.ts`: registro `{forma: aviso_e_clique, versao, texto, aceito_em}`. Sem campo `marcado`. Versao nao enviada pelo navegador (pagina antiga) = sem consentimento registrado. Linha de aceite e layout do form intactos; o form so passa a enviar `aceite_versao`.

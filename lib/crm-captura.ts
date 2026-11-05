@@ -25,11 +25,10 @@ function log(nivel: 'info' | 'error', evento: string, campos: Record<string, unk
   console[nivel === 'error' ? 'error' : 'log'](JSON.stringify({ evento, ...campos }))
 }
 
-// O pacote vendorizado decide o consentimento por `marcado`. Aqui, e so aqui, ele quer dizer
-// "o ato de aceite aconteceu" (clique sob o aviso). Nao e caixa e nao e gravado: o banco recebe
-// estado, texto, versao e hora. A forma `aviso_e_clique` viaja no registro e na fila.
+// O aceite chega ao pacote com a FORMA em que aconteceu (`aviso_e_clique`: aviso a vista, clique no botao).
+// Nao ha caixa. O banco grava forma, texto, versao e hora; a data nunca e inventada aqui.
 function consentimentoDoPacote(a: RegistroAceite): ConsentimentoEntrada[] {
-  return [{ canal: 'email', finalidade: 'marketing', marcado: true, texto_versao: a.versao, texto_aceito: a.texto }]
+  return [{ canal: 'email', finalidade: 'marketing', forma: a.forma, texto_versao: a.versao, texto_aceito: a.texto }]
 }
 
 function entradaDe(item: ItemFila): EntradaCaptura {
