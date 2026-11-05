@@ -5,6 +5,15 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 05/11/2026: aceite verdadeiro, chave restrita e fila de reenvio (auditoria P1, P2, P3)
+
+- `lib/aceite-waitlist.ts`: registro `{forma: aviso_e_clique, versao, texto, aceito_em}`. Sem campo `marcado`. Versao nao enviada pelo navegador (pagina antiga) = sem consentimento registrado. Linha de aceite e layout do form intactos; o form so passa a enviar `aceite_versao`.
+- `lib/crm-captura.ts`: usa `SUPABASE_CAPTURA_JWT` (role `captura_web`), nunca `service_role`. Segue atras de `CRM_ENVIO` (desligada).
+- `lib/fila-captura.ts`: fila em KV (binding `CAPTURA_FILA`), reenvio pela mesma chave de idempotencia, 30 dias de TTL. Binding ausente: site igual a hoje, log `crm.perdido_sem_fila` sem e-mail. Esvazia a fila (3 itens) a cada inscricao que o Supabase aceita.
+- `tests/captura-fila.test.ts` (vitest, `npm test`): 18 testes. `vitest` entra como devDependency.
+- BLOQUEIO ao ligar: `captura_web` so executa `crm.gravar_captura`; o pacote le contatos, capturas e consentimentos pela Data API antes da RPC. Com o papel restrito essas leituras dao 403 e tudo vai para a fila. Falta mover a leitura do gemeo para dentro da RPC (patch em MELFIORE-SITE).
+- Decisao do fundador (05/11): os 100 contatos antigos entram marcados como waitlist antiga, sem e-mail de reconfirmacao.
+
 
 ## 04/11/2026: aceite visivel e versionado na waitlist
 

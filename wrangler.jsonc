@@ -15,6 +15,9 @@
     "BREVO_SENDER_EMAIL": "diario@melfiore.com",
     "BREVO_SENDER_NAME": "MELFIORE"
   },
+  // Fila de reenvio da captura. Namespace ainda NAO criado: sem ele o site segue como hoje e o log avisa.
+  // Criar (a pedido do fundador): npx wrangler kv namespace create CAPTURA_FILA, depois colar o id aqui.
+  // "kv_namespaces": [{ "binding": "CAPTURA_FILA", "id": "<id do namespace>" }],
   "routes": [
     { "pattern": "melfiore.com", "custom_domain": true },
     { "pattern": "www.melfiore.com", "custom_domain": true }

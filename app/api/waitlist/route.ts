@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Contato unico (2A.3): Supabase primeiro, Brevo depois. Desligado por padrao (CRM_ENVIO).
     // Nunca lanca: se o Supabase falhar, a inscricao segue para o Brevo e a pendencia vai ao log.
-    if (crmLigado()) await capturarWaitlistNoCrm({ name, email, ip })
+    if (crmLigado()) await capturarWaitlistNoCrm({ name, email, ip, aceite_versao: body?.aceite_versao })
 
     // Brevo integration (only runs if env vars are set)
     if (process.env.BREVO_API_KEY) {

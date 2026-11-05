@@ -32,7 +32,7 @@ export default function WaitlistForm() {
       const res  = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, aceite_versao: ACEITE_WAITLIST.versao }),
       })
       const data = await res.json()
       if (data.success) setSubmitted(true)

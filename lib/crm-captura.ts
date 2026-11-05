@@ -1,64 +1,134 @@
 // 2A.3: contato unico. Grava no Supabase (crm) ANTES do Brevo. SPEC 14 em ../_DOCS/SITE-OFICIAL/MEDUSA-VPS.
 // Atras da flag CRM_ENVIO: so roda com o valor exato "ligado". Ausente ou outro valor: nada acontece.
-// Nunca lanca: falha do Supabase vira log estruturado e a inscricao segue para o Brevo.
+// Nunca lanca. Falha do Supabase guarda a inscricao inteira na fila (lib/fila-captura.ts) e a inscricao
+// segue para o Brevo. Chave: papel restrito captura_web (migration 009), nunca service_role.
 import { capturarComSupabase } from '@/lib/crm'
+import type { ConsentimentoEntrada } from '@/lib/crm/portas'
 import type { EntradaCaptura } from '@/lib/crm'
-import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
+import { registrarAceite, type RegistroAceite } from '@/lib/aceite-waitlist'
+import { drenar, filaDoAmbiente, guardar, type ItemFila, type KvFila, type Reenvio } from '@/lib/fila-captura'
 
 export function crmLigado(): boolean {
   return process.env.CRM_ENVIO === 'ligado'
 }
 
-// Texto exato do aceite gravado em crm.consentimentos: o mesmo que o form exibe (lib/aceite-waitlist.ts).
-const WAITLIST_ACEITE = {
-  texto_versao: ACEITE_WAITLIST.versao,
-  texto_aceito: ACEITE_WAITLIST.texto,
-}
+const TETO_MS = 7000
 
-async function hashIp(ip: string): Promise<string | undefined> {
-  const sal = process.env.CRM_IP_SALT
+async function hashIp(ip: string, sal: string | undefined): Promise<string | undefined> {
   if (!sal || ip === 'unknown') return undefined // sem sal, IP nao vira hash: melhor nao guardar
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${sal}|${ip}`))
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 function log(nivel: 'info' | 'error', evento: string, campos: Record<string, unknown>) {
-  // Sem e-mail, nome nem corpo de resposta: so o que permite reenviar pela chave.
+  // Sem e-mail, nome nem corpo de resposta: so o que permite achar o item.
   console[nivel === 'error' ? 'error' : 'log'](JSON.stringify({ evento, ...campos }))
 }
 
-export async function capturarWaitlistNoCrm(dados: { name: string; email: string; ip: string }): Promise<void> {
-  const url = process.env.SUPABASE_URL
-  const chave = process.env.SUPABASE_SERVICE_KEY
+// O pacote vendorizado decide o consentimento por `marcado`. Aqui, e so aqui, ele quer dizer
+// "o ato de aceite aconteceu" (clique sob o aviso). Nao e caixa e nao e gravado: o banco recebe
+// estado, texto, versao e hora. A forma `aviso_e_clique` viaja no registro e na fila.
+function consentimentoDoPacote(a: RegistroAceite): ConsentimentoEntrada[] {
+  return [{ canal: 'email', finalidade: 'marketing', marcado: true, texto_versao: a.versao, texto_aceito: a.texto }]
+}
+
+function entradaDe(item: ItemFila): EntradaCaptura {
+  return {
+    origem: 'waitlist',
+    nome: item.nome,
+    email: item.email,
+    // A hora do clique fixa a chave de idempotencia: reenvio horas depois cai na mesma captura.
+    ocorrido_em: item.aceite?.aceito_em ?? item.criado_em,
+    ...(item.aceite ? { consentimentos: consentimentoDoPacote(item.aceite) } : {}),
+    ...(item.ip_hash ? { ip_hash: item.ip_hash } : {}),
+  }
+}
+
+export interface Dependencias {
+  env?: Record<string, string | undefined>
+  capturar?: typeof capturarComSupabase
+  agora?: () => Date
+  /** undefined = busca o binding da Cloudflare; null = sem fila. */
+  fila?: KvFila | null
+  aguardar?: ((p: Promise<unknown>) => void) | null
+  tetoMs?: number
+}
+
+type Desfecho = { estado: 'ok' } | { estado: 'falhou'; codigo: string }
+
+async function tentar(item: ItemFila, d: Required<Pick<Dependencias, 'capturar' | 'tetoMs'>>, url: string, chave: string): Promise<Desfecho> {
+  try {
+    // Teto: estourou, o Brevo segue e a pendencia vai para a fila. O banco ainda pode concluir; reenvio e idempotente.
+    let relogio: ReturnType<typeof setTimeout> | undefined
+    const limite = new Promise<'tempo'>((ok) => { relogio = setTimeout(() => ok('tempo'), d.tetoMs) })
+    const r = await Promise.race([d.capturar(entradaDe(item), { url, chave, timeoutMs: 3000 }), limite])
+    clearTimeout(relogio)
+    if (r === 'tempo') return { estado: 'falhou', codigo: 'tempo' }
+    const { gravacao, resultado } = r
+    if (gravacao.estado === 'falhou' || resultado === null) {
+      return { estado: 'falhou', codigo: gravacao.estado === 'falhou' ? gravacao.codigo : 'leitura' }
+    }
+    if (!resultado.ok) {
+      log('error', 'crm.recusada', { origem: 'waitlist', motivo: resultado.motivo })
+      return { estado: 'ok' } // recusa nao melhora com o tempo: nao reenfileirar
+    }
+    log('info', 'crm.capturado', { origem: 'waitlist', gravacao: gravacao.estado })
+    return { estado: 'ok' }
+  } catch {
+    return { estado: 'falhou', codigo: 'inesperado' }
+  }
+}
+
+export async function capturarWaitlistNoCrm(
+  dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
+  deps: Dependencias = {},
+): Promise<void> {
+  const env = deps.env ?? process.env
+  const url = env.SUPABASE_URL
+  const chave = env.SUPABASE_CAPTURA_JWT // JWT role=captura_web. A service_role nao e lida em lugar nenhum.
   if (!url || !chave) {
     log('error', 'crm.sem_config', { origem: 'waitlist' })
     return
   }
+  const d = { capturar: deps.capturar ?? capturarComSupabase, tetoMs: deps.tetoMs ?? TETO_MS }
+  const agora = (deps.agora ?? (() => new Date()))()
+  let fila: KvFila | null
+  let aguardar: ((p: Promise<unknown>) => void) | null
+  if (deps.fila !== undefined) {
+    fila = deps.fila
+    aguardar = deps.aguardar ?? null
+  } else {
+    ;({ fila, aguardar } = await filaDoAmbiente())
+  }
+
   try {
-    const ip_hash = await hashIp(dados.ip)
-    const entrada: EntradaCaptura = {
-      origem: 'waitlist',
+    const aceite = registrarAceite(dados.aceite_versao, agora)
+    if (!aceite) log('error', 'crm.aceite_ausente', { origem: 'waitlist' })
+    const ip_hash = await hashIp(dados.ip, env.CRM_IP_SALT)
+    const item: ItemFila = {
+      v: 1,
       nome: dados.name,
       email: dados.email,
-      consentimentos: [{ canal: 'email', finalidade: 'marketing', marcado: true, ...WAITLIST_ACEITE }],
       ...(ip_hash ? { ip_hash } : {}),
+      aceite,
+      criado_em: agora.toISOString(),
+      tentativas: 0,
+      ultimo_codigo: '',
     }
-    // Teto de 7 s para o Supabase nao segurar a inscricao: estourou, o Brevo segue e a pendencia fica no log.
-    let relogio: ReturnType<typeof setTimeout> | undefined
-    const limite = new Promise<'tempo'>((ok) => { relogio = setTimeout(() => ok('tempo'), 7000) })
-    const r = await Promise.race([capturarComSupabase(entrada, { url, chave, timeoutMs: 3000 }), limite])
-    clearTimeout(relogio)
-    if (r === 'tempo') {
-      log('error', 'crm.pendente', { origem: 'waitlist', codigo: 'tempo' })
+    const r = await tentar(item, d, url, chave)
+    if (r.estado === 'falhou') {
+      if (!fila) {
+        log('error', 'crm.perdido_sem_fila', { origem: 'waitlist', codigo: r.codigo })
+        return
+      }
+      const id = await guardar(fila, { ...item, ultimo_codigo: r.codigo })
+      log('error', 'crm.na_fila', { origem: 'waitlist', codigo: r.codigo, fila_chave: id })
       return
     }
-    const { gravacao, resultado } = r
-    if (gravacao.estado === 'falhou') {
-      log('error', 'crm.pendente', { origem: 'waitlist', codigo: gravacao.codigo, chave_idempotencia: gravacao.chave_idempotencia })
-    } else if (resultado && !resultado.ok) {
-      log('error', 'crm.recusada', { origem: 'waitlist', motivo: resultado.motivo })
-    } else {
-      log('info', 'crm.capturado', { origem: 'waitlist', gravacao: gravacao.estado })
+    // Supabase respondeu: aproveita para esvaziar a fila (sem segurar a inscricao).
+    if (fila && aguardar) {
+      const reenviar = async (it: ItemFila): Promise<Reenvio> => ((await tentar(it, d, url, chave)).estado === 'ok' ? 'ok' : 'falhou')
+      aguardar(drenar(fila, reenviar))
     }
   } catch {
     log('error', 'crm.pendente', { origem: 'waitlist', codigo: 'inesperado' })
