@@ -14,7 +14,7 @@ function kvFalso(): KvFila & { dados: Map<string, string> } {
   }
 }
 
-const ENV = { SUPABASE_URL: 'https://x.supabase.co', SUPABASE_CAPTURA_JWT: 'jwt-de-teste', SUPABASE_SERVICE_KEY: 'nao-deve-ser-lida' }
+const ENV = { SUPABASE_URL: 'https://x.supabase.co', SUPABASE_CAPTURA_JWT: 'jwt-de-teste', SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_teste', SUPABASE_SERVICE_KEY: 'nao-deve-ser-lida' }
 const AGORA = new Date('2026-11-05T15:30:10.000Z')
 const GENTE = { name: 'Maria Teste', email: 'maria@exemplo.com', ip: '1.2.3.4', aceite_versao: ACEITE_WAITLIST.versao }
 
@@ -51,6 +51,12 @@ describe('captura com chave restrita', () => {
     const capturar = vi.fn().mockResolvedValue(gravada)
     await rodar(capturar, kvFalso()).esperar()
     expect(capturar.mock.calls[0][1].chave).toBe('jwt-de-teste')
+    expect(capturar.mock.calls[0][1].apikey).toBe('sb_publishable_teste')
+  })
+  it('sem chave publishable: nao captura (o gateway recusaria o JWT no apikey)', async () => {
+    const capturar = vi.fn()
+    await capturarWaitlistNoCrm(GENTE, { env: { SUPABASE_URL: 'u', SUPABASE_CAPTURA_JWT: 'j' }, capturar: capturar as never, fila: null })
+    expect(capturar).not.toHaveBeenCalled()
   })
   it('sem JWT: nao captura, nao cai para service key', async () => {
     const capturar = vi.fn()
@@ -160,29 +166,31 @@ describe('ponta a ponta com o pacote real e fetch falso', () => {
   const resp = (status: number, corpo: unknown, h: Record<string, string> = {}) =>
     new Response(JSON.stringify(corpo), { status, headers: { 'content-type': 'application/json', ...h } })
 
-  it('RPC leva a chave restrita e o consentimento sem campo marcado', async () => {
-    const chamadas: { url: string; auth: string | null; corpo: string | null }[] = []
+  it('uma unica chamada, a crm.capturar, com apikey publishable e JWT no bearer; nenhuma leitura de tabela', async () => {
+    const chamadas: { url: string; metodo: string; auth: string | null; apikey: string | null; corpo: string | null }[] = []
     vi.stubGlobal('fetch', async (url: string, init: RequestInit) => {
-      chamadas.push({ url, auth: new Headers(init.headers).get('authorization'), corpo: (init.body as string) ?? null })
-      if (url.includes('/rpc/gravar_captura')) return resp(200, { ok: true, duplicada: false, contato_id: 'c1', criado: true, consentimentos: 1, eventos: 2 })
-      return resp(200, [], { 'content-range': '*/0' })
+      const h = new Headers(init.headers)
+      chamadas.push({ url, metodo: init.method ?? 'GET', auth: h.get('authorization'), apikey: h.get('apikey'), corpo: (init.body as string) ?? null })
+      return resp(200, { ok: true, duplicada: false, criado: true, contato_id: 'c1', estado: 'ativo', suspeito: false, conflito_id: null, consentimentos: 1, eventos: 2, avisos: [], contato: { email: 'maria@exemplo.com', nome: 'Maria Teste', whatsapp_e164: null, origem_primeira: 'waitlist' }, marketing_email: true })
     })
     await capturarWaitlistNoCrm(GENTE, { env: ENV, agora: () => AGORA, fila: kvFalso(), aguardar: null })
     vi.unstubAllGlobals()
-    const rpc = chamadas.find((c) => c.url.includes('/rpc/gravar_captura'))!
+    expect(chamadas).toHaveLength(1)
+    const rpc = chamadas[0]
+    expect(rpc.url).toContain('/rest/v1/rpc/capturar')
+    expect(rpc.metodo).toBe('POST')
     expect(rpc.auth).toBe('Bearer jwt-de-teste')
-    expect(chamadas.every((c) => c.auth === 'Bearer jwt-de-teste')).toBe(true)
-    expect(rpc.corpo).not.toContain('marcado')
+    expect(rpc.apikey).toBe('sb_publishable_teste')
     expect(rpc.corpo).toContain(ACEITE_WAITLIST.texto)
     expect(rpc.corpo).toContain('"ocorrido_em":"2026-11-05T15:30:10.000Z"')
   })
 
-  it('leitura negada (captura_web nao tem select nas tabelas): nada se perde, vai para a fila', async () => {
-    vi.stubGlobal('fetch', async () => resp(403, { code: '42501' }))
+  it('gateway recusa a chave (401): nada se perde, vai para a fila', async () => {
+    vi.stubGlobal('fetch', async () => resp(401, { message: 'x' }))
     const fila = kvFalso()
     await capturarWaitlistNoCrm(GENTE, { env: ENV, agora: () => AGORA, fila, aguardar: null })
     vi.unstubAllGlobals()
     expect(fila.dados.size).toBe(1)
-    expect(JSON.parse([...fila.dados.values()][0]).ultimo_codigo).toBe('http_403_42501')
+    expect(JSON.parse([...fila.dados.values()][0]).ultimo_codigo).toBe('http_401')
   })
 })

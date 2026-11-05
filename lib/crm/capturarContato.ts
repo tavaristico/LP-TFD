@@ -74,7 +74,7 @@ function validarOrigem(origem: string): { base: OrigemBase; tela: string | null 
   return { base: base as OrigemBase, tela: tela === '' ? null : tela }
 }
 
-function origemDoEvento(base: OrigemBase): Evento['origem'] {
+export function origemDoEvento(base: OrigemBase): Evento['origem'] {
   if (base === 'waitlist') return 'waitlist'
   if (base === 'crm') return 'crm'
   if (base === 'direct') return 'admin'
@@ -99,16 +99,28 @@ function vazio(v: string | null | undefined): boolean {
   return v === null || v === undefined || v.trim() === ''
 }
 
-/**
- * Funcao unica de captura (SPEC 14). Ordem: normaliza, dedupe sem fusao, consentimento,
- * evento, so entao Brevo. Falha de evento ou de Brevo nunca desfaz a gravacao.
- */
-export async function capturarContato(entrada: EntradaCaptura, portas: Portas): Promise<ResultadoCaptura> {
-  const { repositorio: repo, registrarEvento, brevo } = portas
-  const relogio = portas.relogio ?? (() => new Date())
-  const gerarId = portas.gerarId ?? randomUUID
-  const avisos: string[] = []
+export interface CapturaPreparada {
+  origem: { base: OrigemBase; tela: string | null }
+  brand: string
+  produtoId: string | null
+  temEmail: boolean
+  temZap: boolean
+  emailNorm: string | null
+  zap: string | null
+  consents: ConsentimentoEntrada[]
+  ocorridoIso: string
+  quando: Date
+  agoraIso: string
+  chave: string
+  avisos: string[]
+}
 
+/**
+ * Normaliza e valida a entrada. Vale para os dois caminhos: o das portas (memoria, leitura+escrita)
+ * e o da RPC `crm.capturar`, onde o banco decide gemeo, repeticao e consentimento.
+ */
+export function prepararCaptura(entrada: EntradaCaptura, agora: Date): { ok: false; motivo: Recusa } | ({ ok: true } & CapturaPreparada) {
+  const avisos: string[] = []
   const origem = validarOrigem(entrada.origem)
   if (!origem) return { ok: false, motivo: 'origem_invalida' }
   const brand = entrada.brand_id ?? 'melfiore'
@@ -134,12 +146,42 @@ export async function capturarContato(entrada: EntradaCaptura, portas: Portas): 
     }
   }
 
-  const agora = relogio()
   const ocorrido = entrada.ocorrido_em ? new Date(entrada.ocorrido_em) : agora
   const ocorridoIso = Number.isNaN(ocorrido.getTime()) ? agora.toISOString() : ocorrido.toISOString()
   const quando = Number.isNaN(ocorrido.getTime()) ? agora : ocorrido
   const agoraIso = agora.toISOString()
   const chave = chaveIdempotencia(entrada.origem, emailNorm, zap, quando, produtoId)
+
+  return {
+    ok: true,
+    origem,
+    brand,
+    produtoId,
+    temEmail,
+    temZap,
+    emailNorm,
+    zap,
+    consents,
+    ocorridoIso,
+    quando,
+    agoraIso,
+    chave,
+    avisos,
+  }
+}
+
+/**
+ * Funcao unica de captura (SPEC 14). Ordem: normaliza, dedupe sem fusao, consentimento,
+ * evento, so entao Brevo. Falha de evento ou de Brevo nunca desfaz a gravacao.
+ */
+export async function capturarContato(entrada: EntradaCaptura, portas: Portas): Promise<ResultadoCaptura> {
+  const { repositorio: repo, registrarEvento, brevo } = portas
+  const relogio = portas.relogio ?? (() => new Date())
+  const gerarId = portas.gerarId ?? randomUUID
+  const agora = relogio()
+  const prep = prepararCaptura(entrada, agora)
+  if (!prep.ok) return { ok: false, motivo: prep.motivo }
+  const { origem, brand, produtoId, temEmail, temZap, emailNorm, zap, consents, ocorridoIso, agoraIso, chave, avisos } = prep
 
   // Procura por email_norm, depois por whatsapp_e164.
   const porEmail = emailNorm ? await repo.buscarPorEmailNorm(brand, emailNorm) : null

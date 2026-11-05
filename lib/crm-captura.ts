@@ -56,12 +56,14 @@ export interface Dependencias {
 
 type Desfecho = { estado: 'ok' } | { estado: 'falhou'; codigo: string }
 
-async function tentar(item: ItemFila, d: Required<Pick<Dependencias, 'capturar' | 'tetoMs'>>, url: string, chave: string): Promise<Desfecho> {
+interface Acesso { url: string; chave: string; apikey: string }
+
+async function tentar(item: ItemFila, d: Required<Pick<Dependencias, 'capturar' | 'tetoMs'>>, acesso: Acesso): Promise<Desfecho> {
   try {
     // Teto: estourou, o Brevo segue e a pendencia vai para a fila. O banco ainda pode concluir; reenvio e idempotente.
     let relogio: ReturnType<typeof setTimeout> | undefined
     const limite = new Promise<'tempo'>((ok) => { relogio = setTimeout(() => ok('tempo'), d.tetoMs) })
-    const r = await Promise.race([d.capturar(entradaDe(item), { url, chave, timeoutMs: 3000 }), limite])
+    const r = await Promise.race([d.capturar(entradaDe(item), { ...acesso, timeoutMs: 3000 }), limite])
     clearTimeout(relogio)
     if (r === 'tempo') return { estado: 'falhou', codigo: 'tempo' }
     const { gravacao, resultado } = r
@@ -86,10 +88,13 @@ export async function capturarWaitlistNoCrm(
   const env = deps.env ?? process.env
   const url = env.SUPABASE_URL
   const chave = env.SUPABASE_CAPTURA_JWT // JWT role=captura_web. A service_role nao e lida em lugar nenhum.
-  if (!url || !chave) {
+  // O gateway recusa JWT customizado no header apikey (401, testado no staging): a chave publishable vai la.
+  const apikey = env.SUPABASE_PUBLISHABLE_KEY
+  if (!url || !chave || !apikey) {
     log('error', 'crm.sem_config', { origem: 'waitlist' })
     return
   }
+  const acesso: Acesso = { url, chave, apikey }
   const d = { capturar: deps.capturar ?? capturarComSupabase, tetoMs: deps.tetoMs ?? TETO_MS }
   const agora = (deps.agora ?? (() => new Date()))()
   let fila: KvFila | null
@@ -115,7 +120,7 @@ export async function capturarWaitlistNoCrm(
       tentativas: 0,
       ultimo_codigo: '',
     }
-    const r = await tentar(item, d, url, chave)
+    const r = await tentar(item, d, acesso)
     if (r.estado === 'falhou') {
       if (!fila) {
         log('error', 'crm.perdido_sem_fila', { origem: 'waitlist', codigo: r.codigo })
@@ -127,7 +132,7 @@ export async function capturarWaitlistNoCrm(
     }
     // Supabase respondeu: aproveita para esvaziar a fila (sem segurar a inscricao).
     if (fila && aguardar) {
-      const reenviar = async (it: ItemFila): Promise<Reenvio> => ((await tentar(it, d, url, chave)).estado === 'ok' ? 'ok' : 'falhou')
+      const reenviar = async (it: ItemFila): Promise<Reenvio> => ((await tentar(it, d, acesso)).estado === 'ok' ? 'ok' : 'falhou')
       aguardar(drenar(fila, reenviar))
     }
   } catch {
