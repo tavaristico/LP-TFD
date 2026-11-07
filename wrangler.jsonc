@@ -15,11 +15,11 @@
     "BREVO_SENDER_EMAIL": "diario@melfiore.com",
     "BREVO_SENDER_NAME": "MELFIORE"
   },
-  // Fila de reenvio da captura. Namespace ainda NAO criado: sem ele o site segue como hoje e o log avisa.
-  // Criar (a pedido do fundador): npx wrangler kv namespace create CAPTURA_FILA, depois colar o id aqui.
-  // "kv_namespaces": [{ "binding": "CAPTURA_FILA", "id": "<id do namespace>" }],
-  // Cron que esvazia a fila sem depender de nova inscricao (custom-worker.ts, scheduled). Ligar JUNTO com o KV
-  // e com CRM_ENVIO=ligado, a pedido do fundador. Sem o KV ou com a flag desligada, o cron so registra no log e sai.
+  // Fila de reenvio da captura. Namespace CAPTURA_FILA criado em 06/11/2026 (sem efeito ate o deploy).
+  // Falta ligar, SO com pedido do fundador (DEVOLUTIVA-2026-11-06.md, item 24): CRM_ENVIO=ligado nas vars,
+  // o cron abaixo, e o deploy. Com a flag desligada o cron so registra no log e sai.
+  "kv_namespaces": [{ "binding": "CAPTURA_FILA", "id": "eaa8592a78454236b8cd4cd582678aa9" }],
+  // Cron que esvazia a fila sem depender de nova inscricao (custom-worker.ts, scheduled). Continua comentado.
   // "triggers": { "crons": ["*/5 * * * *"] },
   "routes": [
     { "pattern": "melfiore.com", "custom_domain": true },

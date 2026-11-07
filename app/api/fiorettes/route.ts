@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
+import { capturarFiorettesNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 const attempts = new Map<string, { count: number; reset: number }>()
 
@@ -64,7 +65,7 @@ async function sendNotification(payload: {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
+    const ip = ipDoCliente(req.headers)
     if (!rateLimit(ip)) {
       return NextResponse.json(
         { success: false, message: 'tenta de novo em instantes.' },
@@ -92,6 +93,16 @@ export async function POST(req: NextRequest) {
     }
 
     const id = randomId()
+
+    // Contato unico (M12): Supabase antes do Brevo, atras de CRM_ENVIO (desligado = nada muda).
+    // A pagina so vira contato se a pessoa deixar e-mail: sem ele nao ha identidade e nada e gravado.
+    // Nunca lanca: falha do Supabase vai para a fila e a entrega da pagina segue.
+    if (crmLigado()) {
+      const email: string = (typeof body?.email === 'string' ? body.email : '').trim().toLowerCase()
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        await capturarFiorettesNoCrm({ name: assinatura, email, ip, aceite_versao: body?.aceite_versao })
+      }
+    }
 
     if (process.env.BREVO_API_KEY && podeEnviarEmail('fiorettes:aviso')) {
       await sendNotification({ id, assinatura, titulo, historia, cidade })

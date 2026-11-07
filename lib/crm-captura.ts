@@ -14,6 +14,17 @@ export function crmLigado(): boolean {
 
 const TETO_MS = 7000
 
+/**
+ * IP do visitante para o rate limit. O site roda atras da Cloudflare, que escreve `cf-connecting-ip`
+ * e sobrescreve o que o cliente mandar. `x-forwarded-for` o cliente falsifica. Sem o header (dev local):
+ * cai no comportamento antigo.
+ */
+export function ipDoCliente(headers: { get(nome: string): string | null }): string {
+  const cf = headers.get('cf-connecting-ip')?.trim()
+  if (cf) return cf
+  return headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
+}
+
 async function hashIp(ip: string, sal: string | undefined): Promise<string | undefined> {
   if (!sal || ip === 'unknown') return undefined // sem sal, IP nao vira hash: melhor nao guardar
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${sal}|${ip}`))
@@ -33,7 +44,7 @@ function consentimentoDoPacote(a: RegistroAceite): ConsentimentoEntrada[] {
 
 function entradaDe(item: ItemFila): EntradaCaptura {
   return {
-    origem: 'waitlist',
+    origem: item.origem ?? 'waitlist',
     nome: item.nome,
     email: item.email,
     // A hora do clique fixa a chave de idempotencia: reenvio horas depois cai na mesma captura.
@@ -70,19 +81,37 @@ async function tentar(item: ItemFila, d: Required<Pick<Dependencias, 'capturar' 
       return { estado: 'falhou', codigo: gravacao.estado === 'falhou' ? gravacao.codigo : 'leitura' }
     }
     if (!resultado.ok) {
-      log('error', 'crm.recusada', { origem: 'waitlist', motivo: resultado.motivo })
+      log('error', 'crm.recusada', { origem: item.origem ?? 'waitlist', motivo: resultado.motivo })
       return { estado: 'ok' } // recusa nao melhora com o tempo: nao reenfileirar
     }
-    log('info', 'crm.capturado', { origem: 'waitlist', gravacao: gravacao.estado })
+    log('info', 'crm.capturado', { origem: item.origem ?? 'waitlist', gravacao: gravacao.estado })
     return { estado: 'ok' }
   } catch {
     return { estado: 'falhou', codigo: 'inesperado' }
   }
 }
 
-export async function capturarWaitlistNoCrm(
+export type OrigemCaptura = 'waitlist' | 'fiorettes'
+
+export function capturarWaitlistNoCrm(
   dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
   deps: Dependencias = {},
+): Promise<void> {
+  return capturarNoCrm('waitlist', dados, deps)
+}
+
+/** M12: mesma captura, origem `fiorettes`. Sem e-mail nao ha identidade: o chamador nem chega aqui. */
+export function capturarFiorettesNoCrm(
+  dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
+  deps: Dependencias = {},
+): Promise<void> {
+  return capturarNoCrm('fiorettes', dados, deps)
+}
+
+async function capturarNoCrm(
+  origem: OrigemCaptura,
+  dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
+  deps: Dependencias,
 ): Promise<void> {
   const env = deps.env ?? process.env
   const url = env.SUPABASE_URL
@@ -90,7 +119,7 @@ export async function capturarWaitlistNoCrm(
   // O gateway recusa JWT customizado no header apikey (401, testado no staging): a chave publishable vai la.
   const apikey = env.SUPABASE_PUBLISHABLE_KEY
   if (!url || !chave || !apikey) {
-    log('error', 'crm.sem_config', { origem: 'waitlist' })
+    log('error', 'crm.sem_config', { origem })
     return
   }
   const acesso: Acesso = { url, chave, apikey }
@@ -107,10 +136,11 @@ export async function capturarWaitlistNoCrm(
 
   try {
     const aceite = registrarAceite(dados.aceite_versao, agora)
-    if (!aceite) log('error', 'crm.aceite_ausente', { origem: 'waitlist' })
+    if (!aceite) log('error', 'crm.aceite_ausente', { origem })
     const ip_hash = await hashIp(dados.ip, env.CRM_IP_SALT)
     const item: ItemFila = {
       v: 1,
+      origem,
       nome: dados.name,
       email: dados.email,
       ...(ip_hash ? { ip_hash } : {}),
@@ -122,11 +152,11 @@ export async function capturarWaitlistNoCrm(
     const r = await tentar(item, d, acesso)
     if (r.estado === 'falhou') {
       if (!fila) {
-        log('error', 'crm.perdido_sem_fila', { origem: 'waitlist', codigo: r.codigo })
+        log('error', 'crm.perdido_sem_fila', { origem, codigo: r.codigo })
         return
       }
       const id = await guardar(fila, { ...item, ultimo_codigo: r.codigo })
-      log('error', 'crm.na_fila', { origem: 'waitlist', codigo: r.codigo, fila_chave: id })
+      log('error', 'crm.na_fila', { origem, codigo: r.codigo, fila_chave: id })
       return
     }
     // Supabase respondeu: aproveita para esvaziar a fila (sem segurar a inscricao).
@@ -135,7 +165,7 @@ export async function capturarWaitlistNoCrm(
       aguardar(drenar(fila, reenviar))
     }
   } catch {
-    log('error', 'crm.pendente', { origem: 'waitlist', codigo: 'inesperado' })
+    log('error', 'crm.pendente', { origem, codigo: 'inesperado' })
   }
 }
 

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
-import { capturarWaitlistNoCrm, crmLigado } from '@/lib/crm-captura'
+import { capturarWaitlistNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
-// In-memory rate limiter (resets on redeploy — adequate for landing page scale)
+// In-memory rate limiter (resets on redeploy, adequate for landing page scale)
 const attempts = new Map<string, { count: number; reset: number }>()
 
 function rateLimit(ip: string): boolean {
@@ -35,10 +35,10 @@ async function addBrevoContact(name: string, email: string): Promise<void> {
     }),
   })
 
-  // 204 = created, 400 with code "duplicate_parameter" = already exists — both are fine
+  // 204 = created, 400 with code "duplicate_parameter" = already exists : both are fine
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    // Duplicate contact is not an error — we treat it as success
+    // Duplicate contact is not an error : we treat it as success
     if (body?.code !== 'duplicate_parameter') {
       throw new Error(`Brevo contact error: ${res.status}`)
     }
@@ -74,7 +74,7 @@ async function sendBrevoWelcomeEmail(name: string, email: string): Promise<void>
 export async function POST(req: NextRequest) {
   try {
     // Rate limiting
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
+    const ip = ipDoCliente(req.headers)
     if (!rateLimit(ip)) {
       return NextResponse.json(
         { success: false, message: 'tente novamente em instantes.' },

@@ -7,7 +7,7 @@
 - Next.js 15 + Tailwind 3 + Brevo (e-mail transacional) · **produção na Cloudflare** (Worker `melfiore`, OpenNext) desde 03/11/2026
 - `npm run dev` · antes de commitar: `npm run build` · prévia no motor da Cloudflare: `npm run cf:preview`
 - Publicar: **só pela skill `/deploy`** (roda `npm run cf:deploy`). `cf:deploy` avulso é bloqueado pelo `tbf-main-guard`.
-- 🔴 **Trava de e-mail** (fundador, 03/11/2026): todo envio passa por `podeEnviarEmail()` em `lib/trava-email.ts` e só sai com `EMAIL_ENVIO=ligado`. Hoje está `desligado` em `wrangler.jsonc`. Ligar exige pedido dele. `scripts/trava-email.mjs` reprova o build se um envio escapar.
+- 🔴 **Trava de e-mail** (fundador, 03/11/2026): todo envio passa por `podeEnviarEmail()` em `lib/trava-email.ts` e só sai com `EMAIL_ENVIO=ligado`. Hoje está `ligado` em `wrangler.jsonc` (pedido dele em 03/11/2026 16h46, template Brevo 1). Mudar o estado exige pedido dele. `scripts/trava-email.mjs` reprova o build se um envio escapar.
 
 ## Branches e deploy
 
@@ -27,7 +27,7 @@
 - Tudo em **lowercase**: exceto `MELFIORE` e siglas
 - Sem emojis, sem exclamações
 - **Nunca revelar o nicho do produto** em texto público
-- MELFIORE fala em primeira pessoa: "ela escolheu", nunca "a marca selecionou" (ver `../MELFIORE_IDENTITY.md`)
+- MELFIORE fala em primeira pessoa: "ela escolheu", nunca "a marca selecionou" (ver `../_BIBLE/`)
 
 ## Identidade visual: não alterar sem revisão
 
@@ -42,7 +42,8 @@
 
 | Precisa de | Leia |
 |---|---|
-| Identidade canônica da marca | `../MELFIORE_IDENTITY.md` |
+| Identidade canônica da marca | `../_BIBLE/` |
+| Estado, número e decisão da loja MELFIORE | `python3 .claude/scripts/obra.py vale` na raiz do ecossistema |
 | Landing page, copy, spec, checklist deploy | `../_DOCS/LP/` |
 | Fiorettes, briefing, copy, wireframe | `../_DOCS/FIORETTES/` |
 | Contas e acessos | `../../_SHARED/INFRA/accounts.md` |

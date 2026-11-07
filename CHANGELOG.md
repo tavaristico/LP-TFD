@@ -5,6 +5,14 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 06/11/2026: /fiorettes na captura, IP da Cloudflare, fila criada (nada em producao)
+
+- `app/api/fiorettes/route.ts`: com `CRM_ENVIO=ligado` e e-mail no corpo, grava no Supabase com origem `fiorettes` antes do Brevo; sem e-mail ou flag desligada, nada muda. O formulario ainda nao pede e-mail (sem mexer em UI).
+- Rate limit das duas rotas usa `cf-connecting-ip` (`ipDoCliente`); sem o header, cai no `x-forwarded-for`.
+- `lib/crm-captura.ts`, `lib/fila-captura.ts`: origem vira parametro; item da fila leva `origem`.
+- `wrangler.jsonc`: KV `CAPTURA_FILA` criado (`eaa8592a78454236b8cd4cd582678aa9`). Cron e `CRM_ENVIO` seguem fora.
+- Ensaio de queda real no staging: `docs/ensaio-fila-captura-2026-11-06.md`. `CLAUDE.md` corrigido (trava de e-mail ligada, `_BIBLE`).
+
 ## 05/11/2026 (noite): captura com papel restrito, forma do aceite e fila agendada (Fase 2A, nada em producao)
 
 - `lib/crm-captura.ts`: uma chamada so, `crm.capturar` (o banco decide gemeo e captura repetida). `apikey` leva a chave publishable (`SUPABASE_PUBLISHABLE_KEY`) e o JWT `captura_web` vai em `Authorization: Bearer`: o gateway recusa JWT customizado no `apikey` (401, testado no staging). Resolve o bloqueio da entrada anterior.

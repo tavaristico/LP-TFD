@@ -17,6 +17,8 @@ export interface KvFila {
 
 export interface ItemFila {
   v: 1
+  /** Ausente nos itens antigos da fila: vale `waitlist`. */
+  origem?: 'waitlist' | 'fiorettes'
   nome: string
   email: string
   /** Hash do IP, nunca o IP. */
