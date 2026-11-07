@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
+import { foraDeProducao } from '@/lib/ambiente'
 import { capturarFiorettesNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 const attempts = new Map<string, { count: number; reset: number }>()
@@ -33,7 +34,7 @@ async function sendNotification(payload: {
   const html = `
     <div style="font-family:monospace;background:#000;color:#e8e8e8;padding:32px;max-width:600px">
       <p style="color:#CC2020;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 24px">
-        nova página recebida — fiorette #${payload.id}
+        nova página recebida: fiorette #${payload.id}
       </p>
       ${payload.assinatura ? `<p style="font-size:12px;color:#7A4848;margin:0 0 4px">assinada: ${payload.assinatura}</p>` : ''}
       ${payload.cidade ? `<p style="font-size:12px;color:#7A4848;margin:0 0 24px">༺${payload.cidade}༻</p>` : '<p style="margin:0 0 24px"></p>'}
@@ -55,7 +56,7 @@ async function sendNotification(payload: {
         email: process.env.BREVO_SENDER_EMAIL ?? 'diario@melfiore.com',
         name:  'arquivo fiorettes',
       },
-      subject: `fiorette #${payload.id} — nova página`,
+      subject: `fiorette #${payload.id}: nova página`,
       htmlContent: html,
     }),
   })
@@ -104,15 +105,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (process.env.BREVO_API_KEY && podeEnviarEmail('fiorettes:aviso')) {
+    if (!process.env.BREVO_API_KEY) {
+      // Sem chave a pagina nao chega a ninguem: em producao nao se confirma.
+      if (foraDeProducao()) {
+        console.log(`[fiorettes:dev] pagina recebida, id ${id}, sem Brevo`)
+        return NextResponse.json({ success: true, id })
+      }
+      console.error('[fiorettes] BREVO_API_KEY ausente')
+      return NextResponse.json(
+        { success: false, message: 'algo deu errado. tenta de novo?' },
+        { status: 500 }
+      )
+    }
+    if (podeEnviarEmail('fiorettes:aviso')) {
       await sendNotification({ id, assinatura, titulo, historia, cidade })
     } else {
-      console.log('[fiorettes:dev] nova página:', { id, assinatura, titulo, historia, cidade })
+      // Trava de e-mail desligada (decisao do fundador): sem aviso, sem erro. Log so com o id.
+      console.log(`[fiorettes] aviso bloqueado pela trava, id ${id}`)
     }
 
     return NextResponse.json({ success: true, id })
   } catch (err) {
-    console.error('[fiorettes] error:', err)
+    console.error('[fiorettes] error:', err instanceof Error ? err.message : 'desconhecido')
     return NextResponse.json(
       { success: false, message: 'algo deu errado. tenta de novo?' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
+import { foraDeProducao } from '@/lib/ambiente'
 import { capturarWaitlistNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 // In-memory rate limiter (resets on redeploy, adequate for landing page scale)
@@ -105,22 +106,30 @@ export async function POST(req: NextRequest) {
     // Nunca lanca: se o Supabase falhar, a inscricao segue para o Brevo e a pendencia vai ao log.
     if (crmLigado()) await capturarWaitlistNoCrm({ name, email, ip, aceite_versao: body?.aceite_versao })
 
-    // Brevo integration (only runs if env vars are set)
-    if (process.env.BREVO_API_KEY) {
-      await addBrevoContact(name, email)
-      // Boas-vindas falhar não derruba o cadastro: o contato já está na lista.
-      if (podeEnviarEmail('waitlist:boas-vindas')) {
-        await sendBrevoWelcomeEmail(name, email).catch((e) =>
-          console.error('[waitlist] boas-vindas falhou (cadastro mantido):', e))
+    // Nunca confirmar sem gravar: em producao, sem chave do Brevo a inscricao nao e gravada em lugar nenhum.
+    if (!process.env.BREVO_API_KEY) {
+      if (foraDeProducao()) {
+        // Modo de desenvolvimento: confirma, sem dado pessoal no log.
+        console.log('[waitlist:dev] inscricao recebida (1), sem Brevo')
+        return NextResponse.json({ success: true, message: 'cadastro confirmado.' })
       }
-    } else {
-      // Dev mode: log only
-      console.log('[waitlist:dev] lead capturado:', { name, email })
+      console.error('[waitlist] BREVO_API_KEY ausente')
+      return NextResponse.json(
+        { success: false, message: 'algo deu errado. tente novamente.' },
+        { status: 500 }
+      )
+    }
+
+    await addBrevoContact(name, email)
+    // Boas-vindas falhar não derruba o cadastro: o contato já está na lista.
+    if (podeEnviarEmail('waitlist:boas-vindas')) {
+      await sendBrevoWelcomeEmail(name, email).catch(() =>
+        console.error('[waitlist] boas-vindas falhou (cadastro mantido)'))
     }
 
     return NextResponse.json({ success: true, message: 'cadastro confirmado.' })
   } catch (err) {
-    console.error('[waitlist] error:', err)
+    console.error('[waitlist] error:', err instanceof Error ? err.message : 'desconhecido')
     return NextResponse.json(
       { success: false, message: 'algo deu errado. tente novamente.' },
       { status: 500 }

@@ -5,6 +5,14 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 07/11/2026: inscricao nunca confirma sem gravar, log sem dado pessoal, GET /api/saude (nada em producao)
+
+- `app/api/waitlist/route.ts`, `app/api/fiorettes/route.ts`: em producao, `BREVO_API_KEY` ausente devolve 500 (log so com o nome da variavel). Antes devolvia 200 e o lead sumia no `console.log`. Fora de producao o modo dev segue. `/fiorettes` separa chave ausente (500) de trava de e-mail desligada (200 sem aviso, como antes). Saem do log: nome, e-mail, assinatura, titulo, historia, cidade; fica so o id.
+- `lib/ambiente.ts` (novo): `foraDeProducao()` e verdadeiro so com `NODE_ENV` development ou test. O `next build` e o define do OpenNext fixam `production` no Worker; ausente ou estranho fecha em producao.
+- `app/api/saude/route.ts` (novo): GET com booleanos `brevo`, `email_envio`, `crm_envio`, `supabase`. Sem valor, sem rede.
+- `app/api/fiorettes/route.ts`: travessoes do e-mail interno de aviso trocados por dois-pontos.
+- `tests/producao.test.ts`: 9 testes. Formularios ja mostram `data.message` em qualquer `success: false`, sem mudanca de UI.
+
 ## 06/11/2026: /fiorettes na captura, IP da Cloudflare, fila criada (nada em producao)
 
 - `app/api/fiorettes/route.ts`: com `CRM_ENVIO=ligado` e e-mail no corpo, grava no Supabase com origem `fiorettes` antes do Brevo; sem e-mail ou flag desligada, nada muda. O formulario ainda nao pede e-mail (sem mexer em UI).
