@@ -10,7 +10,7 @@
   "preview_urls": false,
   "vars": {
     // E-mail ligado a pedido do fundador em 03/11/2026 16h46 ("Deixa ativo"): boas-vindas = template Brevo 1 "DIÁRIO I"
-    "EMAIL_ENVIO": "desligado",
+    "EMAIL_ENVIO": "ligado",
     "BREVO_TEMPLATE_ID": "1",
     "BREVO_SENDER_EMAIL": "diario@melfiore.com",
     "BREVO_SENDER_NAME": "MELFIORE"
