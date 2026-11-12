@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
 import { foraDeProducao } from '@/lib/ambiente'
+import { escaparHtml, lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
 import { capturarFiorettesNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 const attempts = new Map<string, { count: number; reset: number }>()
@@ -31,15 +32,22 @@ async function sendNotification(payload: {
   const to = process.env.FIORETTES_NOTIFY_EMAIL ?? process.env.BREVO_SENDER_EMAIL
   if (!to) throw new Error('notify email not configured')
 
+  const e = {
+    id: escaparHtml(payload.id),
+    assinatura: escaparHtml(payload.assinatura),
+    cidade: escaparHtml(payload.cidade),
+    titulo: escaparHtml(payload.titulo),
+    historia: escaparHtml(payload.historia),
+  }
   const html = `
     <div style="font-family:monospace;background:#000;color:#e8e8e8;padding:32px;max-width:600px">
       <p style="color:#CC2020;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 24px">
-        nova página recebida: fiorette #${payload.id}
+        nova página recebida: fiorette #${e.id}
       </p>
-      ${payload.assinatura ? `<p style="font-size:12px;color:#7A4848;margin:0 0 4px">assinada: ${payload.assinatura}</p>` : ''}
-      ${payload.cidade ? `<p style="font-size:12px;color:#7A4848;margin:0 0 24px">༺${payload.cidade}༻</p>` : '<p style="margin:0 0 24px"></p>'}
-      ${payload.titulo ? `<p style="font-size:14px;color:#CC2020;margin:0 0 16px">${payload.titulo}</p>` : ''}
-      <p style="font-size:16px;line-height:1.8;white-space:pre-wrap;margin:0">${payload.historia}</p>
+      ${payload.assinatura ? `<p style="font-size:12px;color:#7A4848;margin:0 0 4px">assinada: ${e.assinatura}</p>` : ''}
+      ${payload.cidade ? `<p style="font-size:12px;color:#7A4848;margin:0 0 24px">༺${e.cidade}༻</p>` : '<p style="margin:0 0 24px"></p>'}
+      ${payload.titulo ? `<p style="font-size:14px;color:#CC2020;margin:0 0 16px">${e.titulo}</p>` : ''}
+      <p style="font-size:16px;line-height:1.8;white-space:pre-wrap;margin:0">${e.historia}</p>
     </div>
   `
 
@@ -74,11 +82,22 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const body = await req.json()
-    const historia: string = (body?.historia ?? '').trim()
-    const assinatura: string = (body?.assinatura ?? '').trim()
-    const titulo: string = (body?.titulo ?? '').trim()
-    const cidade: string = (body?.cidade ?? '').trim()
+    const lido = await lerCorpoJson(req)
+    if (!lido.ok) {
+      return NextResponse.json({ success: false, message: lido.mensagem }, { status: 400 })
+    }
+    const body = lido.corpo
+    const campos = [textoOuNulo(body.historia), textoOuNulo(body.assinatura), textoOuNulo(body.titulo), textoOuNulo(body.cidade), textoOuNulo(body.email)]
+    if (campos.some((c) => c === null)) {
+      return NextResponse.json({ success: false, message: 'pedido invalido.' }, { status: 400 })
+    }
+    const historia = (campos[0] as string).trim()
+    const assinatura = (campos[1] as string).trim()
+    const titulo = (campos[2] as string).trim()
+    const cidade = (campos[3] as string).trim()
+    if (assinatura.length > TETO.assinatura || titulo.length > TETO.titulo || cidade.length > TETO.cidade || (campos[4] as string).length > TETO.email) {
+      return NextResponse.json({ success: false, message: 'algum campo ficou longo demais.' }, { status: 400 })
+    }
 
     if (!historia || historia.length < 3) {
       return NextResponse.json(

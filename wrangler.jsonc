@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
-  "workers_dev": true,
+  "workers_dev": false, // so o dominio da zona responde (S10-11)
   "preview_urls": false,
   "vars": {
     // E-mail ligado a pedido do fundador em 03/11/2026 16h46 ("Deixa ativo"): boas-vindas = template Brevo 1 "DIÁRIO I"

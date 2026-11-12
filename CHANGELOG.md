@@ -5,6 +5,15 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 12/11/2026: S22 e S23, cabecalhos de seguranca e entrada das rotas de captura (nada publicado)
+
+- `next.config.ts`: `poweredByHeader: false`, CSP em Report-Only (frame-ancestors none, GTM e Vercel liberados) e Permissions-Policy. `lib/seguranca.ts` (novo) guarda as constantes, `escaparHtml`, `lerCorpoJson`, tetos.
+- `custom-worker.ts`: http vira 301 para https; toda resposta leva `Strict-Transport-Security: max-age=15552000` (sem includeSubDomains, sem preload) e sai sem `x-powered-by`.
+- `wrangler.jsonc`: `workers_dev` false. `public/.well-known/security.txt` novo.
+- `app/api/saude/route.ts`: devolve so `{status:'ok'}`.
+- `app/api/fiorettes/route.ts`, `app/api/waitlist/route.ts`: campos escapados no e-mail de aviso, tetos (nome 100, e-mail 254, titulo 120, assinatura 80, cidade 80, corpo 10 kB), JSON invalido ou tipo errado devolve 400.
+- `tests/seguranca.test.ts` (novo, 14 testes); `tests/producao.test.ts` ajustado ao saude novo.
+
 ## 07/11/2026: inscricao nunca confirma sem gravar, log sem dado pessoal, GET /api/saude (nada em producao)
 
 - `app/api/waitlist/route.ts`, `app/api/fiorettes/route.ts`: em producao, `BREVO_API_KEY` ausente devolve 500 (log so com o nome da variavel). Antes devolvia 200 e o lead sumia no `console.log`. Fora de producao o modo dev segue. `/fiorettes` separa chave ausente (500) de trava de e-mail desligada (200 sem aviso, como antes). Saem do log: nome, e-mail, assinatura, titulo, historia, cidade; fica so o id.

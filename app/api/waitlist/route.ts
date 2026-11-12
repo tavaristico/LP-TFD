@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
 import { foraDeProducao } from '@/lib/ambiente'
+import { lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
 import { capturarWaitlistNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 // In-memory rate limiter (resets on redeploy, adequate for landing page scale)
@@ -83,9 +84,21 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const body = await req.json()
-    const name: string  = (body?.name  ?? '').trim()
-    const email: string = (body?.email ?? '').trim().toLowerCase()
+    const lido = await lerCorpoJson(req)
+    if (!lido.ok) {
+      return NextResponse.json({ success: false, message: lido.mensagem }, { status: 400 })
+    }
+    const body = lido.corpo
+    const nomeBruto = textoOuNulo(body.name)
+    const emailBruto = textoOuNulo(body.email)
+    if (nomeBruto === null || emailBruto === null) {
+      return NextResponse.json({ success: false, message: 'pedido invalido.' }, { status: 400 })
+    }
+    const name = nomeBruto.trim()
+    const email = emailBruto.trim().toLowerCase()
+    if (name.length > TETO.nome || email.length > TETO.email) {
+      return NextResponse.json({ success: false, message: 'algum campo ficou longo demais.' }, { status: 400 })
+    }
 
     // Validation
     if (!name || name.length < 2) {

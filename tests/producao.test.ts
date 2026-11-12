@@ -94,25 +94,15 @@ describe('producao: nunca confirmar sem gravar', () => {
 })
 
 describe('GET /api/saude', () => {
-  it('so booleanos, sem valor de chave, sem rede', async () => {
+  it('publico: so "ok", sem estado de integracao, sem rede', async () => {
     vi.stubEnv('BREVO_API_KEY', 'xkeysib-VALOR-SECRETO-123')
     vi.stubEnv('EMAIL_ENVIO', 'ligado')
     vi.stubEnv('CRM_ENVIO', 'desligado')
     vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
-    vi.stubEnv('SUPABASE_CAPTURA_JWT', 'jwt-secreto')
-    vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_x')
     const r = await saude()
     const corpo = await r.json()
-    expect(corpo).toEqual({ brevo: true, email_envio: true, crm_envio: false, supabase: true })
-    const txt = JSON.stringify(corpo)
-    expect(txt).not.toMatch(/SECRETO|jwt|sb_|supabase\.co|xkeysib/)
+    expect(corpo).toEqual({ status: 'ok' })
+    expect(JSON.stringify(corpo)).not.toMatch(/SECRETO|jwt|sb_|supabase|xkeysib|brevo|email|crm/i)
     expect(fetchMock).not.toHaveBeenCalled()
-  })
-  it('tudo ausente: tudo falso', async () => {
-    vi.stubEnv('EMAIL_ENVIO', '')
-    vi.stubEnv('SUPABASE_URL', '')
-    vi.stubEnv('SUPABASE_CAPTURA_JWT', '')
-    vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
-    expect(await (await saude()).json()).toEqual({ brevo: false, email_envio: false, crm_envio: false, supabase: false })
   })
 })
