@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 14/11/2026: numero da fiorette nunca repete (nada publicado)
+
+- `lib/fiorette-id.ts` (novo): `reservarId` sorteia, confere no KV (`CAPTURA_FILA`, prefixo `fiorette-id:`, sem expiracao) e sorteia de novo. Cheio o espaco de 4 digitos (ou 25 tentativas), sobe para 5, ate 8. Evita os 7 numeros do arquivo publico. Sem KV (dev) sorteia como antes.
+- `app/api/fiorettes/route.ts`: sai `randomId()` (Math.random sem checagem, ~39% de colisao com 100 inscritas); entra `reservarId`.
+- Limite: KV nao e atomico, so uma corrida no mesmo milissegundo escapa. Garantia total pede sequencia no Supabase. O numero so existia no e-mail de aviso e na resposta; nao ha tabela.
+- `tests/fiorette-id.test.ts` (novo, 4 testes; sem a checagem, o teste do sorteio viciado falha).
+
 ## 14/11/2026: Vercel Analytics e Speed Insights fora, GA4 atras de chave desligada (nada publicado)
 
 - `app/layout.tsx`: sai `<Analytics />` e `<SpeedInsights />`; GA4 so carrega com `GA4_ATIVO`. `lib/ga4.ts` (novo): `NEXT_PUBLIC_GA4=ligado` no build liga; padrao desligado. Pendencia no advogado: `_DOCS/SITE-OFICIAL/MEDUSA-VPS/LISTA-ADVOGADO.md`.

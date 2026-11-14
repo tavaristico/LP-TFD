@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
 import { foraDeProducao } from '@/lib/ambiente'
 import { escaparHtml, lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
+import { reservarId } from '@/lib/fiorette-id'
+import { filaDoAmbiente } from '@/lib/fila-captura'
 import { capturarFiorettesNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
 const attempts = new Map<string, { count: number; reset: number }>()
@@ -16,10 +18,6 @@ function rateLimit(ip: string): boolean {
   if (entry.count >= 3) return false
   entry.count++
   return true
-}
-
-function randomId(): string {
-  return Math.floor(Math.random() * 10000).toString().padStart(4, '0')
 }
 
 async function sendNotification(payload: {
@@ -112,7 +110,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const id = randomId()
+    // Numero unico: reservado no KV antes de ser entregue (lib/fiorette-id.ts).
+    const id = await reservarId((await filaDoAmbiente()).fila)
 
     // Contato unico (M12): Supabase antes do Brevo, atras de CRM_ENVIO (desligado = nada muda).
     // A pagina so vira contato se a pessoa deixar e-mail: sem ele nao ha identidade e nada e gravado.
