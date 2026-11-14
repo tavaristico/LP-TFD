@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 14/11/2026: Vercel Analytics e Speed Insights fora, GA4 atras de chave desligada (nada publicado)
+
+- `app/layout.tsx`: sai `<Analytics />` e `<SpeedInsights />`; GA4 so carrega com `GA4_ATIVO`. `lib/ga4.ts` (novo): `NEXT_PUBLIC_GA4=ligado` no build liga; padrao desligado. Pendencia no advogado: `_DOCS/SITE-OFICIAL/MEDUSA-VPS/LISTA-ADVOGADO.md`.
+- `package.json` e lockfile: removidos `@vercel/analytics` e `@vercel/speed-insights`.
+- `lib/seguranca.ts`: CSP Report-Only sem hosts da Vercel.
+- `app/privacidade/page.tsx`: secoes 2 e 7 dizem que nao ha analytics nem cookie de analise.
+
 ## 12/11/2026: S22 e S23, cabecalhos de seguranca e entrada das rotas de captura (nada publicado)
 
 - `next.config.ts`: `poweredByHeader: false`, CSP em Report-Only (frame-ancestors none, GTM e Vercel liberados) e Permissions-Policy. `lib/seguranca.ts` (novo) guarda as constantes, `escaparHtml`, `lerCorpoJson`, tetos.

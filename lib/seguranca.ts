@@ -43,14 +43,14 @@ export const PERMISSIONS_POLICY =
   'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()'
 
 // Report-Only: nada e bloqueado, so aparece no console do navegador. 'unsafe-inline' porque o Next
-// e o GTM injetam script inline; trocar por nonce quando o relatorio sair limpo.
+// (e o GTM, se o GA4 for ligado) injetam script inline; trocar por nonce quando o relatorio sair limpo.
 export const CSP_REPORT_ONLY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
+  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

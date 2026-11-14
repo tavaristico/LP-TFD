@@ -71,7 +71,7 @@ export default function PrivacidadePage() {
             Política de Privacidade
           </h1>
           <p style={{ color: '#555555', fontSize: '12px', fontWeight: 200, letterSpacing: '0.06em' }}>
-            Última atualização: junho de 2026
+            Última atualização: novembro de 2026
           </p>
         </header>
 
@@ -105,9 +105,8 @@ export default function PrivacidadePage() {
           </p>
           <p style={{ marginTop: '16px' }}><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Dados de navegação</strong></p>
           <p>
-            Utilizamos o Google Analytics e o Vercel Analytics para coleta de dados agregados de acesso
-            (páginas visitadas, localização aproximada, tipo de dispositivo). Esses dados são anonimizados
-            e não permitem identificação individual.
+            Este site não usa ferramentas de análise de acesso nem de terceiros para medir a navegação.
+            Se isso mudar, esta política será atualizada antes e o aviso de cookies será exibido.
           </p>
         </Section>
 
@@ -180,9 +179,8 @@ export default function PrivacidadePage() {
 
         <Section title="7. Cookies">
           <p>
-            Utilizamos apenas cookies técnicos necessários para o funcionamento do site e cookies de
-            analytics de terceiros (Google Analytics, Vercel Analytics). Não utilizamos cookies de
-            rastreamento publicitário.
+            Utilizamos apenas cookies técnicos necessários para o funcionamento do site. Não utilizamos
+            cookies de análise nem de rastreamento publicitário.
           </p>
         </Section>
 
