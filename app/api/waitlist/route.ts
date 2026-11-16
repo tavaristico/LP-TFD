@@ -2,22 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { podeEnviarEmail } from '@/lib/trava-email'
 import { foraDeProducao } from '@/lib/ambiente'
 import { lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
+import { conferirTurnstile, ehRobo, permitirTentativa, type Memoria } from '@/lib/antirrobo'
 import { capturarWaitlistNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
-// In-memory rate limiter (resets on redeploy, adequate for landing page scale)
-const attempts = new Map<string, { count: number; reset: number }>()
-
-function rateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = attempts.get(ip)
-  if (!entry || entry.reset < now) {
-    attempts.set(ip, { count: 1, reset: now + 60_000 })
-    return true
-  }
-  if (entry.count >= 5) return false
-  entry.count++
-  return true
-}
+// Limite por IP: binding da Cloudflare, com a memoria da instancia como reserva (lib/antirrobo.ts, S11)
+const memoria: Memoria = new Map()
 
 async function addBrevoContact(name: string, email: string): Promise<void> {
   const firstName = name.trim().split(' ')[0]
@@ -77,7 +66,7 @@ export async function POST(req: NextRequest) {
   try {
     // Rate limiting
     const ip = ipDoCliente(req.headers)
-    if (!rateLimit(ip)) {
+    if (!(await permitirTentativa('LIMITE_WAITLIST', ip, memoria, 5))) {
       return NextResponse.json(
         { success: false, message: 'tente novamente em instantes.' },
         { status: 429 }
@@ -89,6 +78,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: lido.mensagem }, { status: 400 })
     }
     const body = lido.corpo
+    // Isca preenchida = robo: finge sucesso e nao grava nada.
+    if (ehRobo(body)) return NextResponse.json({ success: true, message: 'cadastro confirmado.' })
+    const verificacao = await conferirTurnstile(body.turnstile, ip)
+    if (!verificacao.ok) {
+      console.error(`[waitlist] antirrobo recusou (${verificacao.motivo})`)
+      return NextResponse.json({ success: false, message: 'nao deu para confirmar. tente novamente.' }, { status: 403 })
+    }
     const nomeBruto = textoOuNulo(body.name)
     const emailBruto = textoOuNulo(body.email)
     if (nomeBruto === null || emailBruto === null) {

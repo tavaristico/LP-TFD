@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { TarjaSvg } from './TarjaSvg'
 import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
+import { CAMPO_ISCA } from '@/lib/antirrobo'
+import { Isca, Turnstile } from './Antirrobo'
 
 type FormState  = { name: string; email: string }
 type FormErrors = { name?: string; email?: string; server?: string }
@@ -13,6 +15,9 @@ export default function WaitlistForm() {
   const [loading, setLoading]     = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [focused, setFocused]     = useState<'name' | 'email' | null>(null)
+  const [isca, setIsca]           = useState('')
+  const [token, setToken]         = useState('')
+  const aoToken = useCallback((t: string) => setToken(t), [])
 
   function validate(): FormErrors {
     const e: FormErrors = {}
@@ -32,7 +37,7 @@ export default function WaitlistForm() {
       const res  = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, aceite_versao: ACEITE_WAITLIST.versao }),
+        body: JSON.stringify({ ...form, aceite_versao: ACEITE_WAITLIST.versao, [CAMPO_ISCA]: isca, turnstile: token }),
       })
       const data = await res.json()
       if (data.success) setSubmitted(true)
@@ -62,6 +67,7 @@ export default function WaitlistForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-2 sm:gap-3">
+      <Isca valor={isca} aoMudar={setIsca} />
 
       {/* Nome */}
       <div className="flex flex-col gap-1.5">
@@ -187,6 +193,7 @@ export default function WaitlistForm() {
         seus dados são criptografados e protegidos.<br />
         no spam, ever.
       </p>
+      <Turnstile aoToken={aoToken} />
     </form>
   )
 }
