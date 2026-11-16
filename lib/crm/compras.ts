@@ -2,11 +2,20 @@
 import { randomUUID } from 'node:crypto'
 import { origemDoEvento, prepararCaptura } from './capturarContato'
 import { emailCanonico } from './normalizar'
+import {
+  normalizarCpf,
+  normalizarEndereco,
+  normalizarFormaPagamento,
+  type Endereco,
+} from './dadosPessoais'
 
 // Entrada de compras (SPEC 14 passo 10, 21; docs/motor/0008-compras-no-crm.md).
 // O subscriber do Medusa manda UM json por evento. Este modulo valida, normaliza o comprador
 // (a mesma regra da captura) e monta o corpo de crm.registrar_compra. Quem decide e grava e o banco.
-// A compra NUNCA leva CPF, endereco, cartao nem consentimento: campo desses e recusado, nao ignorado,
+// Central de dados (migration 019): a compra leva tudo que o pedido ja tiver, CPF e endereco inclusive, e o CRM guarda
+// em crm.contato_dados e crm.compra_dados (so dono e operacao leem). Nenhum campo e pedido ao cliente so para o CRM.
+// Campo ausente fica vazio; dado opcional ruim (CPF invalido) vira aviso, nunca recusa.
+// A compra NUNCA leva cartao, senha nem consentimento: campo desses e recusado, nao ignorado,
 // para o erro do subscriber aparecer no dia e nao virar dado guardado sem querer.
 
 export const TIPOS_COMPRA = [
@@ -39,6 +48,10 @@ export interface EntradaCompra {
     numero?: string
     moeda?: string
     subtotal_centavos: number
+    forma_pagamento?: string
+    parcelas?: number
+    endereco_entrega?: Endereco
+    endereco_cobranca?: Endereco
     frete_centavos?: number
     desconto_centavos?: number
     total_centavos: number
@@ -46,7 +59,7 @@ export interface EntradaCompra {
     utm?: Record<string, string>
     itens: ItemCompra[]
   }
-  comprador: { email: string; nome?: string; whatsapp?: string; customer_id?: string }
+  comprador: { email: string; nome?: string; whatsapp?: string; customer_id?: string; cpf?: string; endereco?: Endereco }
 }
 
 export type RecusaCompra =
@@ -68,8 +81,7 @@ const MAX_ITENS = 100
 
 /** Nome de campo que a compra nao aceita em nenhuma profundidade. Comparacao sem caixa e sem acento. */
 const PROIBIDOS = new Set([
-  'cpf', 'cnpj', 'rg', 'endereco', 'address', 'cep', 'logradouro', 'rua', 'bairro', 'complemento',
-  'cartao', 'card', 'cvv', 'pan', 'senha', 'password', 'consentimento', 'consentimentos',
+  'cnpj', 'rg', 'cartao', 'card', 'cvv', 'pan', 'senha', 'password', 'consentimento', 'consentimentos',
 ])
 
 function achaProibido(v: unknown, profundidade = 0): boolean {
@@ -140,12 +152,25 @@ export function validarCompra(bruto: unknown): ResultadoValidacao {
 
   if (typeof comprador.email !== 'string') return no('email_invalido')
   for (const k of Object.keys(comprador)) {
-    if (!['email', 'nome', 'whatsapp', 'customer_id'].includes(k)) return no('comprador_invalido')
+    if (!['email', 'nome', 'whatsapp', 'customer_id', 'cpf', 'endereco'].includes(k)) return no('comprador_invalido')
   }
-  if (comprador.nome !== undefined && !texto(comprador.nome, 200)) return no('comprador_invalido')
-  if (comprador.whatsapp !== undefined && !texto(comprador.whatsapp, 40)) return no('comprador_invalido')
-  if (comprador.customer_id !== undefined && !(typeof comprador.customer_id === 'string' && RE_REF.test(comprador.customer_id))) {
+  // null = ausente (o Medusa manda null em campo vazio). CPF ou endereco ruim nunca derruba a venda: vira aviso em prepararCompra.
+  const ausente = (v: unknown) => v === undefined || v === null
+  if (!ausente(comprador.nome) && !texto(comprador.nome, 200)) return no('comprador_invalido')
+  if (!ausente(comprador.whatsapp) && !texto(comprador.whatsapp, 40)) return no('comprador_invalido')
+  if (!ausente(comprador.customer_id) && !(typeof comprador.customer_id === 'string' && RE_REF.test(comprador.customer_id))) {
     return no('comprador_invalido')
+  }
+  if (!ausente(comprador.cpf) && !(typeof comprador.cpf === 'string' && comprador.cpf.length <= 40)) return no('comprador_invalido')
+  if (!ausente(comprador.endereco) && !ehObj(comprador.endereco)) return no('comprador_invalido')
+  for (const k of ['endereco_entrega', 'endereco_cobranca'] as const) {
+    if (!ausente(pedido[k]) && !ehObj(pedido[k])) return no('valor_invalido')
+  }
+  if (!ausente(pedido.forma_pagamento) && !(typeof pedido.forma_pagamento === 'string' && pedido.forma_pagamento.length <= 60)) {
+    return no('valor_invalido')
+  }
+  if (!ausente(pedido.parcelas) && !(typeof pedido.parcelas === 'number' && Number.isInteger(pedido.parcelas) && pedido.parcelas >= 1 && pedido.parcelas <= 48)) {
+    return no('valor_invalido')
   }
   return { ok: true, entrada: bruto as unknown as EntradaCompra }
 }
@@ -156,6 +181,8 @@ export interface CorpoRegistrarCompra {
   pedido: Record<string, unknown>
   customer_id: string | null
   captura: Record<string, unknown>
+  /** Central de dados: CPF (11 digitos) e endereco do comprador, ja normalizados. Vazio = nulo, nunca erro. */
+  dados: { cpf: string | null; endereco: Endereco | null }
 }
 
 export type Preparada =
@@ -177,14 +204,24 @@ export function prepararCompra(
     {
       origem: 'checkout',
       email: entrada.comprador.email,
-      ...(entrada.comprador.nome !== undefined ? { nome: entrada.comprador.nome } : {}),
-      ...(entrada.comprador.whatsapp !== undefined ? { whatsapp: entrada.comprador.whatsapp } : {}),
+      ...(entrada.comprador.nome != null ? { nome: entrada.comprador.nome } : {}),
+      ...(entrada.comprador.whatsapp != null ? { whatsapp: entrada.comprador.whatsapp } : {}),
       ocorrido_em: entrada.pedido.criado_em,
     },
     agora,
   )
   if (!prep.ok || prep.emailNorm === null) return { ok: false, motivo: 'email_invalido' }
   const nome = entrada.comprador.nome?.trim() ?? ''
+  const avisosDados: string[] = []
+  const cpfBruto = typeof entrada.comprador.cpf === 'string' ? entrada.comprador.cpf.trim() : ''
+  const cpf = cpfBruto === '' ? null : normalizarCpf(cpfBruto)
+  if (cpfBruto !== '' && cpf === null) avisosDados.push('cpf_invalido_ignorado')
+  const entrega = normalizarEndereco(entrada.pedido.endereco_entrega)
+  const cobranca = normalizarEndereco(entrada.pedido.endereco_cobranca)
+  const forma = normalizarFormaPagamento(entrada.pedido.forma_pagamento)
+  if (typeof entrada.pedido.forma_pagamento === 'string' && forma === null) avisosDados.push('forma_pagamento_ignorada')
+  // Comprador sem endereco proprio herda o do pedido: e o que o pedido ja trouxe, sem pedir nada.
+  const enderecoContato = normalizarEndereco(entrada.comprador.endereco) ?? entrega ?? cobranca
   const captura = {
     brand_id: prep.brand,
     origem: 'checkout',
@@ -203,15 +240,23 @@ export function prepararCompra(
     contato_id_novo: gerarId(),
     conflito_id: gerarId(),
   }
+  const { endereco_entrega: _e, endereco_cobranca: _c, forma_pagamento: _f, ...pedidoBase } = entrada.pedido
+  const pedido: Record<string, unknown> = {
+    ...pedidoBase,
+    ...(forma !== null ? { forma_pagamento: forma } : {}),
+    ...(entrega !== null ? { endereco_entrega: entrega } : {}),
+    ...(cobranca !== null ? { endereco_cobranca: cobranca } : {}),
+  }
   return {
     ok: true,
-    avisos: prep.avisos,
+    avisos: [...prep.avisos, ...avisosDados],
     corpo: {
       brand_id: prep.brand,
       evento: entrada.evento,
-      pedido: { ...entrada.pedido },
+      pedido,
       customer_id: entrada.comprador.customer_id ?? null,
       captura,
+      dados: { cpf, endereco: enderecoContato },
     },
   }
 }

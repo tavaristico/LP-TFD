@@ -6,7 +6,8 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const aqui = dirname(fileURLToPath(import.meta.url))
-const site = resolve(aqui, '../../MELFIORE-SITE/packages')
+// MELFIORE_SITE_DIR aponta outra copia do MELFIORE-SITE (worktree de feature); sem ela, o checkout vizinho.
+const site = resolve(process.env.MELFIORE_SITE_DIR ?? resolve(aqui, '../../MELFIORE-SITE'), 'packages')
 const destino = resolve(aqui, '../lib/crm')
 mkdirSync(destino, { recursive: true })
 
@@ -15,6 +16,7 @@ const copias = [
   ['crm/src/assinatura.ts', 'assinatura.ts'],
   ['crm/src/capturarContato.ts', 'capturarContato.ts'],
   ['crm/src/compras.ts', 'compras.ts'],
+  ['crm/src/dadosPessoais.ts', 'dadosPessoais.ts'],
   ['crm/src/comprasSupabase.ts', 'comprasSupabase.ts'],
   ['crm/src/id.ts', 'id.ts'],
   ['crm/src/normalizar.ts', 'normalizar.ts'],

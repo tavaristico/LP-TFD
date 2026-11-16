@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 16/11/2026: CRM central de dados, celular na landing (nada publicado)
+
+- `app/api/loja/compra/route.ts` (sem mudanca) agora leva ao CRM tudo que o pedido ja tiver: CPF, endereco de entrega e cobranca, forma de pagamento, celular. Nenhum campo e pedido ao cliente so para o CRM; ausente fica vazio, sem erro; CPF invalido vira aviso. Cartao, senha, CNPJ e RG seguem recusados (422). Vem do pacote sincronizado (`lib/crm/compras.ts`, novo `lib/crm/dadosPessoais.ts`); `scripts/sincronizar-crm.mjs` copia o arquivo novo e aceita `MELFIORE_SITE_DIR` (worktree).
+- `components/WaitlistForm.tsx`: campo WhatsApp opcional (mobile-first, mesma tarja), pre-checagem em `lib/celular-br.ts` (sem import de Node). `app/api/waitlist/route.ts`: celular preenchido e invalido volta 400; valido vira E.164 e entra pela mesma captura do e-mail (`capturarWaitlistNoCrm`, fila KV inclusa). Nunca vai ao Brevo, sem consentimento de WhatsApp, sem envio novo.
+- Testes: `tests/waitlist-celular.test.ts` (novo), `tests/rota-compras.test.ts` (CPF e endereco entram, sem CPF nao quebra, nada para Brevo), `tests/captura-fila.test.ts`.
+- Depende da migration 019 do MELFIORE-SITE (so arquivo, nao aplicada). `COMPRAS_ENTRADA` e `CRM_ENVIO` continuam como estavam.
+
 ## 16/11/2026: S25, rota de entrada de compras assinada, desligada (nada publicado)
 
 - `lib/crm/`: sincronizado com `MELFIORE-SITE/packages/crm` (assinatura HMAC, validacao de compras, `receberCompra`, tipos de evento de compra, `postarRpc`). `scripts/sincronizar-crm.mjs` copia os 4 arquivos novos e ajusta um cast de tipo no `verify` (tsc do LP-TFD).

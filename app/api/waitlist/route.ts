@@ -4,6 +4,7 @@ import { foraDeProducao } from '@/lib/ambiente'
 import { lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
 import { conferirTurnstile, ehRobo, permitirTentativa, type Memoria } from '@/lib/antirrobo'
 import { capturarWaitlistNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
+import { normalizarCelularBR } from '@/lib/crm/dadosPessoais'
 
 // Limite por IP: binding da Cloudflare, com a memoria da instancia como reserva (lib/antirrobo.ts, S11)
 const memoria: Memoria = new Map()
@@ -111,9 +112,23 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Celular (opcional): vazio segue sem ele; preenchido e invalido e recusado, nunca ignorado em silencio.
+    // Vira E.164 e vai SO para o CRM (identidade e dedup). Nunca vai ao Brevo: nenhum envio novo nasce daqui.
+    const zapBruto = typeof body.whatsapp === 'string' ? body.whatsapp.trim() : ''
+    if (body.whatsapp !== undefined && body.whatsapp !== null && typeof body.whatsapp !== 'string') {
+      return NextResponse.json({ success: false, message: 'celular inválido. use DDD + 9 dígitos.' }, { status: 400 })
+    }
+    if (zapBruto.length > TETO.nome) {
+      return NextResponse.json({ success: false, message: 'algum campo ficou longo demais.' }, { status: 400 })
+    }
+    const whatsapp = zapBruto === '' ? null : normalizarCelularBR(zapBruto)
+    if (zapBruto !== '' && whatsapp === null) {
+      return NextResponse.json({ success: false, message: 'celular inválido. use DDD + 9 dígitos.' }, { status: 400 })
+    }
+
     // Contato unico (2A.3): Supabase primeiro, Brevo depois. Desligado por padrao (CRM_ENVIO).
     // Nunca lanca: se o Supabase falhar, a inscricao segue para o Brevo e a pendencia vai ao log.
-    if (crmLigado()) await capturarWaitlistNoCrm({ name, email, ip, aceite_versao: body?.aceite_versao })
+    if (crmLigado()) await capturarWaitlistNoCrm({ name, email, ...(whatsapp ? { whatsapp } : {}), ip, aceite_versao: body?.aceite_versao })
 
     // Nunca confirmar sem gravar: em producao, sem chave do Brevo a inscricao nao e gravada em lugar nenhum.
     if (!process.env.BREVO_API_KEY) {
