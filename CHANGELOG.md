@@ -5,6 +5,14 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 16/11/2026: camada 7, ciber em codigo: S11, S26, S27, S34 provas (nada publicado)
+
+- S11: `lib/antirrobo.ts` (novo) e `components/Antirrobo.tsx` (novo). Limite por IP via binding de rate limit da Cloudflare (`wrangler.jsonc`, `ratelimits`, LIMITE_WAITLIST 5/min e LIMITE_FIORETTES 3/min), memoria da instancia como reserva; campo isca escondido (rota finge sucesso e nao grava); Turnstile dormente ate `TURNSTILE_SECRET_KEY` (servidor) e `NEXT_PUBLIC_TURNSTILE_SITEKEY` (build). CSP Report-Only ganha `challenges.cloudflare.com`. Sem texto novo na tela.
+- S27: `delete-ghost-contact.mjs` sai da raiz (ignorado pelo git) e vira `scripts/delete-ghost-contact.mjs` versionado: ensaio por padrao, `--confirmo` para apagar (e digitar o numero no terminal), poupa contato com WhatsApp, SMS ou telefone. `.gitignore` perde a linha dele.
+- S26: `.github/workflows/ci.yml` (testes, `npm audit --omit=dev --audit-level=critical`, build, cabecalhos) e `scripts/checar-cabecalhos.mjs`. Nao ativa nada no GitHub; deploy segue so pelo `/deploy`.
+- S34: `tests/analytics.test.ts` prova o que o commit 0463497 fez. `app/privacidade/page.tsx:140` ainda cita a Vercel como hospedagem: conferir com o fundador (o site roda na Cloudflare).
+- Testes: `tests/antirrobo.test.ts`, `delete-ghost-contact.test.ts`, `ci.test.ts`, `analytics.test.ts`.
+
 ## 14/11/2026: numero da fiorette nunca repete (nada publicado)
 
 - `lib/fiorette-id.ts` (novo): `reservarId` sorteia, confere no KV (`CAPTURA_FILA`, prefixo `fiorette-id:`, sem expiracao) e sorteia de novo. Cheio o espaco de 4 digitos (ou 25 tentativas), sobe para 5, ate 8. Evita os 7 numeros do arquivo publico. Sem KV (dev) sorteia como antes.
