@@ -78,6 +78,27 @@ describe('captura com chave restrita', () => {
   })
 })
 
+describe('celular na captura', () => {
+  it('vai ao CRM como identidade, sem criar consentimento de WhatsApp', async () => {
+    const capturar = vi.fn().mockResolvedValue(gravada)
+    await capturarWaitlistNoCrm({ ...GENTE, whatsapp: '+5511987654321' }, { env: ENV, agora: () => AGORA, fila: kvFalso(), aguardar: () => {}, capturar: capturar as never })
+    const e = capturar.mock.calls[0][0]
+    expect(e.whatsapp).toBe('+5511987654321')
+    expect(e.consentimentos.map((c: { canal: string }) => c.canal)).toEqual(['email'])
+  })
+  it('sem celular: a entrada segue igual a de antes', async () => {
+    const capturar = vi.fn().mockResolvedValue(gravada)
+    await rodar(capturar, kvFalso()).esperar()
+    expect(capturar.mock.calls[0][0]).not.toHaveProperty('whatsapp')
+  })
+  it('falha do Supabase: o celular vai junto na fila e volta no reenvio', async () => {
+    const fila = kvFalso()
+    await capturarWaitlistNoCrm({ ...GENTE, whatsapp: '+5511987654321' }, { env: ENV, agora: () => AGORA, fila, aguardar: () => {}, capturar: vi.fn().mockResolvedValue(falhou) as never })
+    const item = JSON.parse([...fila.dados.values()][0])
+    expect(item.whatsapp).toBe('+5511987654321')
+  })
+})
+
 describe('fila de reenvio', () => {
   it('falha do Supabase: guarda a inscricao inteira, com aceite, sem IP bruto', async () => {
     const fila = kvFalso()

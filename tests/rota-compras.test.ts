@@ -86,14 +86,74 @@ describe('/api/loja/compra', () => {
   })
 
   it.each([
-    ['cpf', { comprador: { email: 'a@b.co', cpf: '00000000000' } }],
-    ['endereco', { pedido: { ...entrada().pedido, endereco: { rua: 'x' } } }],
     ['cartao', { comprador: { email: 'a@b.co', cartao: '4111' } }],
+    ['senha', { comprador: { email: 'a@b.co', senha: 'x' } }],
+    ['cvv', { pedido: { ...entrada().pedido, pagamento: { cvv: '123' } } }],
   ])('assinada com %s no corpo: 422 e nao grava', async (_nome, extra) => {
     vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
     const r = await POST(await pedido(entrada(extra)))
     expect(r.status).toBe(422)
     expect(await r.json()).toEqual({ ok: false, motivo: 'campo_proibido' })
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  describe('central de dados: CPF e endereco', () => {
+    const corpoDaRpc = () => JSON.parse(fetchMock.mock.calls[0][1].body as string).p
+
+    it('compra com CPF, celular e endereco entra completa; so CPF em digitos e endereco normalizado seguem para o banco', async () => {
+      vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
+      const e = entrada({
+        comprador: { email: 'Cliente@Example.com', nome: 'Cliente', customer_id: 'cus_01', cpf: '529.982.247-25', whatsapp: '(11) 98765-4321' },
+        pedido: {
+          ...entrada().pedido,
+          forma_pagamento: 'PIX',
+          endereco_entrega: { cep: '01310-100', logradouro: 'Av. Paulista', numero: '1000', complemento: 'apto 12', bairro: 'Bela Vista', cidade: 'Sao Paulo', uf: 'sp' },
+        },
+      })
+      const r = await POST(await pedido(e))
+      expect(r.status).toBe(200)
+      const p = corpoDaRpc()
+      expect(p.dados.cpf).toBe('52998224725')
+      expect(p.dados.endereco).toMatchObject({ cep: '01310100', uf: 'SP', cidade: 'Sao Paulo' })
+      expect(p.pedido.endereco_entrega.logradouro).toBe('Av. Paulista')
+      expect(p.pedido.forma_pagamento).toBe('pix')
+      expect(p.captura.whatsapp_e164).toBe('+5511987654321')
+      expect(p.captura.email_norm).toBe('cliente@example.com')
+      // CPF e endereco nunca entram no bloco de captura (identidade/consentimento) nem no evento
+      expect(JSON.stringify(p.captura)).not.toMatch(/52998224725|Paulista/)
+      expect(p.captura).not.toHaveProperty('consentimentos')
+    })
+
+    it('compra sem CPF e sem endereco nao quebra: dados vazios', async () => {
+      vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
+      const r = await POST(await pedido(entrada()))
+      expect(r.status).toBe(200)
+      expect(corpoDaRpc().dados).toEqual({ cpf: null, endereco: null })
+    })
+
+    it('campos novos null (o Medusa manda null em campo vazio) passam sem erro', async () => {
+      vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
+      const e = entrada({ comprador: { email: 'a@b.co', nome: null, whatsapp: null, cpf: null, endereco: null, customer_id: null } })
+      const r = await POST(await pedido(e))
+      expect(r.status).toBe(200)
+    })
+
+    it('CPF invalido: a venda entra sem o CPF e a resposta traz o aviso', async () => {
+      vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
+      fetchMock.mockImplementation(async () =>
+        Response.json({ ok: true, duplicada: false, compra_id: 'c1', contato_id: 'k1', estado: 'aberta', criada: true, avisos: [] }),
+      )
+      const r = await POST(await pedido(entrada({ comprador: { email: 'a@b.co', cpf: '111.111.111-11' } })))
+      expect(r.status).toBe(200)
+      expect(corpoDaRpc().dados.cpf).toBeNull()
+      expect((await r.json()).avisos).toContain('cpf_invalido_ignorado')
+    })
+
+    it('nada vai para Brevo nem Meta: a unica chamada de rede e a RPC do Supabase', async () => {
+      vi.stubEnv('COMPRAS_ENTRADA', 'ligado')
+      await POST(await pedido(entrada({ comprador: { email: 'a@b.co', cpf: '529.982.247-25' } })))
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(String(fetchMock.mock.calls[0][0])).toMatch(/^https:\/\/ref\.supabase\.co\//)
+    })
   })
 })

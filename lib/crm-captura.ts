@@ -47,6 +47,8 @@ function entradaDe(item: ItemFila): EntradaCaptura {
     origem: item.origem ?? 'waitlist',
     nome: item.nome,
     email: item.email,
+    // Celular so como identidade: nenhum consentimento de WhatsApp nasce aqui, e nada sai para ele.
+    ...(item.whatsapp ? { whatsapp: item.whatsapp } : {}),
     // A hora do clique fixa a chave de idempotencia: reenvio horas depois cai na mesma captura.
     ocorrido_em: item.aceite?.aceito_em ?? item.criado_em,
     ...(item.aceite ? { consentimentos: consentimentoDoPacote(item.aceite) } : {}),
@@ -94,7 +96,7 @@ async function tentar(item: ItemFila, d: Required<Pick<Dependencias, 'capturar' 
 export type OrigemCaptura = 'waitlist' | 'fiorettes'
 
 export function capturarWaitlistNoCrm(
-  dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
+  dados: { name: string; email: string; whatsapp?: string; ip: string; aceite_versao?: unknown },
   deps: Dependencias = {},
 ): Promise<void> {
   return capturarNoCrm('waitlist', dados, deps)
@@ -110,7 +112,7 @@ export function capturarFiorettesNoCrm(
 
 async function capturarNoCrm(
   origem: OrigemCaptura,
-  dados: { name: string; email: string; ip: string; aceite_versao?: unknown },
+  dados: { name: string; email: string; whatsapp?: string; ip: string; aceite_versao?: unknown },
   deps: Dependencias,
 ): Promise<void> {
   const env = deps.env ?? process.env
@@ -143,6 +145,7 @@ async function capturarNoCrm(
       origem,
       nome: dados.name,
       email: dados.email,
+      ...(dados.whatsapp ? { whatsapp: dados.whatsapp } : {}),
       ...(ip_hash ? { ip_hash } : {}),
       aceite,
       criado_em: agora.toISOString(),

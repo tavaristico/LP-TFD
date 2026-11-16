@@ -5,16 +5,17 @@ import { TarjaSvg } from './TarjaSvg'
 import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
 import { CAMPO_ISCA } from '@/lib/antirrobo'
 import { Isca, Turnstile } from './Antirrobo'
+import { celularPareceValido } from '@/lib/celular-br'
 
-type FormState  = { name: string; email: string }
-type FormErrors = { name?: string; email?: string; server?: string }
+type FormState  = { name: string; email: string; whatsapp: string }
+type FormErrors = { name?: string; email?: string; whatsapp?: string; server?: string }
 
 export default function WaitlistForm() {
-  const [form, setForm]           = useState<FormState>({ name: '', email: '' })
+  const [form, setForm]           = useState<FormState>({ name: '', email: '', whatsapp: '' })
   const [errors, setErrors]       = useState<FormErrors>({})
   const [loading, setLoading]     = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [focused, setFocused]     = useState<'name' | 'email' | null>(null)
+  const [focused, setFocused]     = useState<'name' | 'email' | 'whatsapp' | null>(null)
   const [isca, setIsca]           = useState('')
   const [token, setToken]         = useState('')
   const aoToken = useCallback((t: string) => setToken(t), [])
@@ -24,6 +25,7 @@ export default function WaitlistForm() {
     if (!form.name.trim())                                    e.name  = 'Por favor, insira seu nome.'
     if (!form.email.trim())                                   e.email = 'Por favor, insira seu e-mail.'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'E-mail inválido.'
+    if (form.whatsapp.trim() && !celularPareceValido(form.whatsapp)) e.whatsapp = 'celular inválido. use DDD + 9 dígitos.'
     return e
   }
 
@@ -41,6 +43,7 @@ export default function WaitlistForm() {
       })
       const data = await res.json()
       if (data.success) setSubmitted(true)
+      else if (res.status === 400 && /celular/.test(String(data.message))) setErrors({ whatsapp: data.message })
       else setErrors({ server: data.message || 'Algo deu errado. Tente novamente.' })
     } catch {
       setErrors({ server: 'Sem conexão. Tente novamente em instantes.' })
@@ -119,6 +122,33 @@ export default function WaitlistForm() {
         </div>
         {errors.email && (
           <span className="text-xs font-light text-brand-error pl-1">{errors.email}</span>
+        )}
+      </div>
+
+      {/* WhatsApp (opcional) */}
+      <div className="flex flex-col gap-1.5">
+        <div className="tarja-field">
+          <TarjaSvg
+            fill={loading ? '#030000' : '#0a0000'}
+            stroke={errors.whatsapp ? '#FF4444' : focused === 'whatsapp' ? '#CC2020' : '#2a1212'}
+          />
+          <input
+            type="tel"
+            id="waitlist-whatsapp"
+            aria-label="Seu WhatsApp (opcional)"
+            placeholder="e seu whatsapp? (se quiser)"
+            value={form.whatsapp}
+            onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
+            onFocus={() => setFocused('whatsapp')}
+            onBlur={() => setFocused(null)}
+            className="tarja-input font-brand"
+            autoComplete="tel"
+            inputMode="tel"
+            disabled={loading}
+          />
+        </div>
+        {errors.whatsapp && (
+          <span className="text-xs font-light text-brand-error pl-1">{errors.whatsapp}</span>
         )}
       </div>
 

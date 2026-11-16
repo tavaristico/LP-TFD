@@ -21,6 +21,8 @@ export interface ItemFila {
   origem?: 'waitlist' | 'fiorettes'
   nome: string
   email: string
+  /** Celular BR em E.164, so identidade (dedup no CRM). Opcional: ausente nos itens antigos da fila. */
+  whatsapp?: string
   /** Hash do IP, nunca o IP. */
   ip_hash?: string
   /** null = a pessoa entra sem consentimento de marketing registrado. */
