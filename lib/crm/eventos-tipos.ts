@@ -9,6 +9,8 @@ export const CATALOGO_EVENTOS = [
   "carrinho.item_adicionado",
   "checkout.iniciado",
   "pedido.criado",
+  "pedido.cancelado",
+  "reembolso.registrado",
   "pagamento.confirmado",
   "pedido.enviado",
   "devolucao.pedida",

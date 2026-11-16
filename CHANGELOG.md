@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 16/11/2026: S25, rota de entrada de compras assinada, desligada (nada publicado)
+
+- `lib/crm/`: sincronizado com `MELFIORE-SITE/packages/crm` (assinatura HMAC, validacao de compras, `receberCompra`, tipos de evento de compra, `postarRpc`). `scripts/sincronizar-crm.mjs` copia os 4 arquivos novos e ajusta um cast de tipo no `verify` (tsc do LP-TFD).
+- `app/api/loja/compra/route.ts` (novo) e `lib/trava-compras.ts` (novo): fecha por padrao, so abre com `COMPRAS_ENTRADA=ligado` (fora do `wrangler.jsonc`, nao ligada). Recusa CPF, endereco e cartao (422). Nunca envia e-mail.
+- Segredos vem de `COMPRAS_ASSINATURA_SEGREDO`, `COMPRAS_ASSINATURA_SEGREDO_ANTERIOR`, `SUPABASE_COMPRAS_JWT`: nada configurado.
+- `tests/rota-compras.test.ts` (novo, 8 testes, Supabase mockado).
+
 ## 16/11/2026: camada 7, ciber em codigo: S11, S26, S27, S34 provas (nada publicado)
 
 - S11: `lib/antirrobo.ts` (novo) e `components/Antirrobo.tsx` (novo). Limite por IP via binding de rate limit da Cloudflare (`wrangler.jsonc`, `ratelimits`, LIMITE_WAITLIST 5/min e LIMITE_FIORETTES 3/min), memoria da instancia como reserva; campo isca escondido (rota finge sucesso e nao grava); Turnstile dormente ate `TURNSTILE_SECRET_KEY` (servidor) e `NEXT_PUBLIC_TURNSTILE_SITEKEY` (build). CSP Report-Only ganha `challenges.cloudflare.com`. Sem texto novo na tela.

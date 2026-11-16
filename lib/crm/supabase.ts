@@ -75,9 +75,10 @@ async function erroDe(r: Response): Promise<ErroSupabase> {
   return new ErroSupabase(code !== '' ? `http_${r.status}_${code}` : `http_${r.status}`)
 }
 
-async function chamarRpc(cfg: ConfigSupabase, corpo: unknown): Promise<RespostaRpc> {
+/** POST de uma RPC do schema crm, com uma segunda tentativa em erro de rede ou 5xx (as RPCs sao idempotentes). */
+export async function postarRpc(cfg: ConfigSupabase, nome: string, corpo: unknown): Promise<unknown> {
   const f = cfg.fetch ?? fetch
-  const url = `${cfg.url.replace(/\/+$/, '')}/rest/v1/rpc/capturar`
+  const url = `${cfg.url.replace(/\/+$/, '')}/rest/v1/rpc/${nome}`
   const init = (): RequestInit => ({
     method: 'POST',
     headers: {
@@ -105,7 +106,15 @@ async function chamarRpc(cfg: ConfigSupabase, corpo: unknown): Promise<RespostaR
   }
   if (r === null || r.status >= 500) r = await tentar()
   if (!r.ok) throw await erroDe(r)
-  const j = (await r.json()) as Partial<RespostaRpc>
+  try {
+    return (await r.json()) as unknown
+  } catch {
+    throw new ErroSupabase('resposta_invalida')
+  }
+}
+
+async function chamarRpc(cfg: ConfigSupabase, corpo: unknown): Promise<RespostaRpc> {
+  const j = (await postarRpc(cfg, 'capturar', corpo)) as Partial<RespostaRpc>
   if (typeof j?.contato_id !== 'string' || typeof j.estado !== 'string') throw new ErroSupabase('resposta_invalida')
   return j as RespostaRpc
 }
