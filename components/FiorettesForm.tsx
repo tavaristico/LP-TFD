@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { TarjaSvg } from './TarjaSvg'
+import { CAMPO_ISCA } from '@/lib/antirrobo'
+import { Isca, Turnstile } from './Antirrobo'
 
 type FormState = {
   assinatura: string
@@ -28,6 +30,9 @@ export default function FiorettesForm() {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [focused, setFocused] = useState<Focused>(null)
+  const [isca, setIsca] = useState('')
+  const [token, setToken] = useState('')
+  const aoToken = useCallback((t: string) => setToken(t), [])
 
   function set(field: keyof FormState, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -55,6 +60,8 @@ export default function FiorettesForm() {
           titulo: form.titulo,
           historia: form.historia,
           cidade: form.cidade,
+          [CAMPO_ISCA]: isca,
+          turnstile: token,
         }),
       })
       const data = await res.json()
@@ -100,6 +107,7 @@ export default function FiorettesForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
+      <Isca valor={isca} aoMudar={setIsca} />
 
       {/* Card container — liquid glass */}
       <div style={{
@@ -270,6 +278,7 @@ export default function FiorettesForm() {
         ao entregar, autorizo que MELFIORE leia e preserve esta página
       </p>
 
+      <Turnstile aoToken={aoToken} />
     </form>
   )
 }

@@ -4,21 +4,11 @@ import { foraDeProducao } from '@/lib/ambiente'
 import { escaparHtml, lerCorpoJson, textoOuNulo, TETO } from '@/lib/seguranca'
 import { reservarId } from '@/lib/fiorette-id'
 import { filaDoAmbiente } from '@/lib/fila-captura'
+import { conferirTurnstile, ehRobo, permitirTentativa, type Memoria } from '@/lib/antirrobo'
 import { capturarFiorettesNoCrm, crmLigado, ipDoCliente } from '@/lib/crm-captura'
 
-const attempts = new Map<string, { count: number; reset: number }>()
-
-function rateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = attempts.get(ip)
-  if (!entry || entry.reset < now) {
-    attempts.set(ip, { count: 1, reset: now + 60_000 })
-    return true
-  }
-  if (entry.count >= 3) return false
-  entry.count++
-  return true
-}
+// Limite por IP: binding da Cloudflare, com a memoria da instancia como reserva (lib/antirrobo.ts, S11)
+const memoria: Memoria = new Map()
 
 async function sendNotification(payload: {
   id: string
@@ -73,7 +63,7 @@ async function sendNotification(payload: {
 export async function POST(req: NextRequest) {
   try {
     const ip = ipDoCliente(req.headers)
-    if (!rateLimit(ip)) {
+    if (!(await permitirTentativa('LIMITE_FIORETTES', ip, memoria, 3))) {
       return NextResponse.json(
         { success: false, message: 'tenta de novo em instantes.' },
         { status: 429 }
@@ -85,6 +75,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: lido.mensagem }, { status: 400 })
     }
     const body = lido.corpo
+    // Isca preenchida = robo: finge sucesso e nao grava nada.
+    if (ehRobo(body)) return NextResponse.json({ success: true, id: '0000' })
+    const verificacao = await conferirTurnstile(body.turnstile, ip)
+    if (!verificacao.ok) {
+      console.error(`[fiorettes] antirrobo recusou (${verificacao.motivo})`)
+      return NextResponse.json({ success: false, message: 'nao deu para confirmar. tenta de novo?' }, { status: 403 })
+    }
     const campos = [textoOuNulo(body.historia), textoOuNulo(body.assinatura), textoOuNulo(body.titulo), textoOuNulo(body.cidade), textoOuNulo(body.email)]
     if (campos.some((c) => c === null)) {
       return NextResponse.json({ success: false, message: 'pedido invalido.' }, { status: 400 })

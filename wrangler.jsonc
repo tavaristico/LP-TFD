@@ -18,6 +18,12 @@
   // Fila de reenvio da captura. Namespace CAPTURA_FILA criado em 06/11/2026 (sem efeito ate o deploy).
   // Falta ligar, SO com pedido do fundador (DEVOLUTIVA-2026-11-06.md, item 24): CRM_ENVIO=ligado nas vars,
   // o cron abaixo, e o deploy. Com a flag desligada o cron so registra no log e sai.
+  // Limite de tentativas por IP que vale entre as instancias do Worker (S11). Ids sao so rotulos da conta.
+  // Sem estes bindings a rota cai na memoria da instancia. Periodo aceito: 10 ou 60 segundos.
+  "ratelimits": [
+    { "name": "LIMITE_WAITLIST",  "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } },
+    { "name": "LIMITE_FIORETTES", "namespace_id": "1002", "simple": { "limit": 3, "period": 60 } }
+  ],
   "kv_namespaces": [{ "binding": "CAPTURA_FILA", "id": "eaa8592a78454236b8cd4cd582678aa9" }],
   // Cron que esvazia a fila sem depender de nova inscricao (custom-worker.ts, scheduled). Continua comentado.
   // "triggers": { "crons": ["*/5 * * * *"] },
