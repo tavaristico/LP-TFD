@@ -34,7 +34,7 @@ function rodar(capturar: unknown, fila: KvFila | null, extra: Record<string, unk
 describe('aceite', () => {
   it('registra forma, versao, texto exato e hora', () => {
     expect(registrarAceite(ACEITE_WAITLIST.versao, AGORA)).toEqual({
-      forma: 'aviso_e_clique', versao: 'waitlist-2026-11-04', texto: ACEITE_WAITLIST.texto, aceito_em: '2026-11-05T15:30:10.000Z',
+      forma: 'aviso_e_clique', versao: ACEITE_WAITLIST.versao, texto: ACEITE_WAITLIST.texto, aceito_em: '2026-11-05T15:30:10.000Z',
     })
   })
   it('sem campo marcado', () => {

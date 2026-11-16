@@ -94,8 +94,14 @@ export default function PrivacidadePage() {
         <Section title="2. Dados que coletamos">
           <p><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Lista de espera</strong></p>
           <p>
-            Ao se cadastrar na lista de espera do MELFIORE, coletamos seu nome e endereço de e-mail.
-            Esses dados são usados exclusivamente para enviar comunicações sobre o lançamento.
+            Ao se cadastrar na lista de espera do MELFIORE, coletamos seu nome e endereço de e-mail e, se você informar, seu celular (WhatsApp).
+            Esses dados são usados para enviar comunicações sobre o lançamento e para identificar seu cadastro.
+          </p>
+          <p style={{ marginTop: '16px' }}><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Compra na loja</strong></p>
+          <p>
+            Quando houver compra, guardamos no seu cadastro da loja o CPF e o endereço do pedido. Usamos
+            esses dados apenas para entrega, emissão de nota e atendimento. Não são vendidos nem usados
+            para anúncio.
           </p>
           <p style={{ marginTop: '16px' }}><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Fiorettes — o diário</strong></p>
           <p>
@@ -114,6 +120,7 @@ export default function PrivacidadePage() {
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
               'Enviar e-mails de comunicação sobre o lançamento do MELFIORE',
+              'Entregar pedidos, emitir nota e prestar atendimento (CPF, endereço e celular, quando houver compra)',
               'Selecionar e publicar páginas submetidas ao Fiorettes (com sua autorização implícita no envio)',
               'Melhorar a experiência do site com base em dados agregados de navegação',
             ].map((item, i) => (

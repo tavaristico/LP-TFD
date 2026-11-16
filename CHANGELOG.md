@@ -5,6 +5,13 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 16/11/2026: aceite cobre celular e dados da compra; fim da afirmacao de criptografia (nada publicado)
+
+- `lib/aceite-waitlist.ts`: texto novo (versao `waitlist-2026-11-16`): cobre e-mail e celular informados e diz que CPF e endereco do pedido ficam no cadastro da loja, so para entrega, nota e atendimento, nunca vendidos nem usados em anuncio.
+- `components/WaitlistForm.tsx`: microcopy "seus dados sao criptografados e protegidos" vira "seus dados ficam protegidos" (a coluna do CPF nao e cifrada).
+- `app/privacidade/page.tsx`: celular, CPF e endereco com finalidade (secoes 2 e 3). Travessoes e a linha da Vercel (secao 4) ja existiam e ficaram.
+- `tests/aceite-texto.test.ts` (novo), `tests/captura-fila.test.ts` (versao vem da constante). `COPY.md` 1.7b, 1.9, 1.9b atualizado.
+
 ## 16/11/2026: CRM central de dados, celular na landing (nada publicado)
 
 - `app/api/loja/compra/route.ts` (sem mudanca) agora leva ao CRM tudo que o pedido ja tiver: CPF, endereco de entrega e cobranca, forma de pagamento, celular. Nenhum campo e pedido ao cliente so para o CRM; ausente fica vazio, sem erro; CPF invalido vira aviso. Cartao, senha, CNPJ e RG seguem recusados (422). Vem do pacote sincronizado (`lib/crm/compras.ts`, novo `lib/crm/dadosPessoais.ts`); `scripts/sincronizar-crm.mjs` copia o arquivo novo e aceita `MELFIORE_SITE_DIR` (worktree).

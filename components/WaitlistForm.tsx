@@ -220,7 +220,7 @@ export default function WaitlistForm() {
         className="hidden sm:block text-center mt-1"
         style={{ color: '#7A4848', fontSize: '13px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.75 }}
       >
-        seus dados são criptografados e protegidos.<br />
+        seus dados ficam protegidos.<br />
         no spam, ever.
       </p>
       <Turnstile aoToken={aoToken} />

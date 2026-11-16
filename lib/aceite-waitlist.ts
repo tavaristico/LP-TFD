@@ -3,8 +3,9 @@
 // fica a vista e o clique em "cadastrar" e o ato. O registro diz exatamente isso.
 export const ACEITE_WAITLIST = {
   forma: 'aviso_e_clique',
-  versao: 'waitlist-2026-11-04',
-  texto: 'ao se cadastrar, você aceita receber e-mails da MELFIORE. sai quando quiser.',
+  versao: 'waitlist-2026-11-16',
+  texto:
+    'ao se cadastrar, você aceita receber e-mails da MELFIORE e que o e-mail e o celular informados fiquem guardados; sai quando quiser. se comprar, cpf e endereço do pedido ficam no cadastro da loja, só para entrega, nota e atendimento, nunca vendidos nem usados em anúncio.',
 } as const
 
 export interface RegistroAceite {
