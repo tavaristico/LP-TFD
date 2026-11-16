@@ -1,0 +1,35 @@
+# S26: CI minimo. Roda testes, auditoria de pacote e cabecalhos antes de qualquer deploy.
+# Nao publica nada: o deploy segue so pela skill /deploy. Nenhum segredo entra aqui.
+name: ci
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: testes
+        run: npm test
+      - name: auditoria de pacote (so producao, so critico; os altos ficam no card S9)
+        run: npm audit --omit=dev --audit-level=critical
+      - name: build
+        run: npm run build
+      - name: cabecalhos de seguranca no build
+        run: |
+          npx next start -p 3199 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3199/ >/dev/null && break; sleep 1; done
+          node scripts/checar-cabecalhos.mjs http://localhost:3199
