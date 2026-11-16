@@ -29,12 +29,12 @@ async function sendNotification(payload: {
   }
   const html = `
     <div style="font-family:monospace;background:#000;color:#e8e8e8;padding:32px;max-width:600px">
-      <p style="color:#CC2020;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 24px">
+      <p style="color:#D95C5C;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 24px">
         nova página recebida: fiorette #${e.id}
       </p>
-      ${payload.assinatura ? `<p style="font-size:12px;color:#7A4848;margin:0 0 4px">assinada: ${e.assinatura}</p>` : ''}
-      ${payload.cidade ? `<p style="font-size:12px;color:#7A4848;margin:0 0 24px">༺${e.cidade}༻</p>` : '<p style="margin:0 0 24px"></p>'}
-      ${payload.titulo ? `<p style="font-size:14px;color:#CC2020;margin:0 0 16px">${e.titulo}</p>` : ''}
+      ${payload.assinatura ? `<p style="font-size:12px;color:#B07A7A;margin:0 0 4px">assinada: ${e.assinatura}</p>` : ''}
+      ${payload.cidade ? `<p style="font-size:12px;color:#B07A7A;margin:0 0 24px">༺${e.cidade}༻</p>` : '<p style="margin:0 0 24px"></p>'}
+      ${payload.titulo ? `<p style="font-size:14px;color:#D95C5C;margin:0 0 16px">${e.titulo}</p>` : ''}
       <p style="font-size:16px;line-height:1.8;white-space:pre-wrap;margin:0">${e.historia}</p>
     </div>
   `

@@ -61,7 +61,7 @@ export default function WaitlistForm() {
         >
           Você está dentro.
         </p>
-        <p className="mt-3 text-sm font-light" style={{ color: '#CC2020', lineHeight: 1.6 }}>
+        <p className="mt-3 text-sm font-light" style={{ color: 'var(--mf-text-brand-small)', lineHeight: 1.6 }}>
           Fique de olho no seu e-mail.<br />Em breve, tudo fará sentido.
         </p>
       </div>
@@ -76,8 +76,8 @@ export default function WaitlistForm() {
       <div className="flex flex-col gap-1.5">
         <div className="tarja-field">
           <TarjaSvg
-            fill={loading ? '#030000' : '#0a0000'}
-            stroke={errors.name ? '#FF4444' : focused === 'name' ? '#CC2020' : '#2a1212'}
+            fill={loading ? 'var(--mf-bg-field-busy)' : 'var(--mf-bg-field)'}
+            stroke={errors.name ? 'var(--mf-state-error)' : focused === 'name' ? 'var(--mf-border-active)' : 'var(--mf-border-tarja)'}
           />
           <input
             type="text"
@@ -102,8 +102,8 @@ export default function WaitlistForm() {
       <div className="flex flex-col gap-1.5">
         <div className="tarja-field">
           <TarjaSvg
-            fill={loading ? '#030000' : '#0a0000'}
-            stroke={errors.email ? '#FF4444' : focused === 'email' ? '#CC2020' : '#2a1212'}
+            fill={loading ? 'var(--mf-bg-field-busy)' : 'var(--mf-bg-field)'}
+            stroke={errors.email ? 'var(--mf-state-error)' : focused === 'email' ? 'var(--mf-border-active)' : 'var(--mf-border-tarja)'}
           />
           <input
             type="email"
@@ -129,8 +129,8 @@ export default function WaitlistForm() {
       <div className="flex flex-col gap-1.5">
         <div className="tarja-field">
           <TarjaSvg
-            fill={loading ? '#030000' : '#0a0000'}
-            stroke={errors.whatsapp ? '#FF4444' : focused === 'whatsapp' ? '#CC2020' : '#2a1212'}
+            fill={loading ? 'var(--mf-bg-field-busy)' : 'var(--mf-bg-field)'}
+            stroke={errors.whatsapp ? 'var(--mf-state-error)' : focused === 'whatsapp' ? 'var(--mf-border-active)' : 'var(--mf-border-tarja)'}
           />
           <input
             type="tel"
@@ -161,11 +161,11 @@ export default function WaitlistForm() {
       <div
         className={`tarja-field${!loading ? ' tarja-btn-glow' : ''}`}
       >
-        <TarjaSvg fill={loading ? '#8B1515' : '#CC2020'} />
+        <TarjaSvg fill={loading ? 'var(--mf-accent-busy)' : 'var(--mf-accent)'} />
         <button
           type="submit"
           disabled={loading}
-          className="font-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="font-brand focus-ring tarja-cta"
           style={{
             position: 'absolute',
             inset: 0,
@@ -191,7 +191,7 @@ export default function WaitlistForm() {
       {/* Aceite (prova gravada em lib/aceite-waitlist.ts) */}
       <p
         className="text-center"
-        style={{ color: '#AAAAAA', fontSize: '11px', fontWeight: 300, letterSpacing: '0.04em', lineHeight: 1.5 }}
+        style={{ color: 'var(--mf-text-tier-label)', fontSize: '12px', fontWeight: 300, letterSpacing: '0.04em', lineHeight: 1.5 }}
       >
         {ACEITE_WAITLIST.texto}
       </p>
@@ -203,7 +203,7 @@ export default function WaitlistForm() {
         rel="noopener noreferrer"
         className="text-center block"
         style={{
-          color: '#FFD700',
+          color: 'var(--mf-text-invite-link)',
           fontSize: '13px',
           fontWeight: 200,
           letterSpacing: '0.10em',
@@ -218,7 +218,7 @@ export default function WaitlistForm() {
       {/* Microcopy */}
       <p
         className="hidden sm:block text-center mt-1"
-        style={{ color: '#7A4848', fontSize: '13px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.75 }}
+        style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '13px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.75 }}
       >
         seus dados ficam protegidos.<br />
         no spam, ever.

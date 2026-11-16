@@ -52,7 +52,7 @@ function TarjaDivider() {
       aria-hidden
       style={{ width: '120px', height: '12px', position: 'relative', margin: '48px auto', opacity: 0.4 }}
     >
-      <TarjaSvg fill="#7A4848" />
+      <TarjaSvg fill="var(--mf-color-mauve)" />
     </div>
   )
 }
@@ -69,7 +69,7 @@ export default function FiorettesPage() {
         color: '#E8E8E8',
       }}
     >
-      {/* Fundo fixo — blobs + grain */}
+      {/* Fundo fixo: blobs + grain */}
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         <div className="bg-blob bg-blob-1" />
         <div className="bg-blob bg-blob-2" />
@@ -85,7 +85,7 @@ export default function FiorettesPage() {
         {/* ── Hero ── */}
         <section className="text-center" style={{ paddingTop: '72px', paddingBottom: '40px' }}>
 
-          {/* Ticker — título principal, full-bleed */}
+          {/* Ticker: título principal, full-bleed */}
           <div
             className="anim-fade-in delay-100"
             style={{
@@ -129,14 +129,14 @@ export default function FiorettesPage() {
             o que aconteceu mas não contou.
           </p>
           <p
-            className="headline-glow anim-fade-up delay-350"
+            className="headline-glow headline-glow-sm anim-fade-up delay-350"
             style={{ fontSize: '14px', fontWeight: 400, letterSpacing: '0.06em' }}
           >
             MELFIORE está lendo.
           </p>
         </section>
 
-        {/* ── Formulário — no topo ── */}
+        {/* ── Formulário: no topo ── */}
         <section id="formulario" className="anim-fade-up delay-500" style={{ marginBottom: '0' }}>
           <FiorettesForm />
         </section>
@@ -148,14 +148,14 @@ export default function FiorettesPage() {
           <p style={{ color: '#E8E8E8', fontSize: '16px', fontWeight: 300, lineHeight: 1.8 }}>
             você sabe o que guardou.
           </p>
-          <p className="headline-glow" style={{ fontSize: '16px', fontWeight: 400, letterSpacing: '0.04em', marginTop: '2px' }}>
+          <p className="headline-glow headline-glow-sm" style={{ fontSize: '16px', fontWeight: 400, letterSpacing: '0.04em', marginTop: '2px' }}>
             MELFIORE também quer saber.
           </p>
         </section>
 
         <TarjaDivider />
 
-        {/* ── Arquivo — masonry grid ── */}
+        {/* ── Arquivo: masonry grid ── */}
         <section aria-label="arquivo" className="fiorettes-grid" style={{ paddingBottom: '80px' }}>
           {entries.map((entry, i) => (
             <article
@@ -165,7 +165,7 @@ export default function FiorettesPage() {
                 animationDelay: `${0.1 + i * 0.06}s`,
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.09)',
-                borderRadius: '12px',
+                borderRadius: 'var(--mf-radius-card)',
                 backdropFilter: 'blur(20px) saturate(160%)',
                 WebkitBackdropFilter: 'blur(20px) saturate(160%)',
                 overflow: 'hidden',
@@ -177,7 +177,7 @@ export default function FiorettesPage() {
                   fontSize: '11px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
-                  color: '#7A4848',
+                  color: 'var(--mf-color-mauve-lt)',
                   margin: 0,
                 }}>
                   fiorette #{entry.id}
@@ -207,11 +207,11 @@ export default function FiorettesPage() {
                 justifyContent: 'flex-end',
                 gap: '12px',
               }}>
-                <span style={{ color: '#7A4848', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em' }}>
+                <span style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em' }}>
                   assinada: {entry.signature}
                 </span>
                 {entry.city && (
-                  <span style={{ color: '#7A4848', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em' }}>
+                  <span style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em' }}>
                     ༺{entry.city}༻
                   </span>
                 )}
@@ -226,18 +226,18 @@ export default function FiorettesPage() {
           padding: '0 0 calc(40px + env(safe-area-inset-bottom, 0px))',
           textAlign: 'center',
         }}>
-          <p style={{ color: '#555555', fontSize: '13px', fontWeight: 200, letterSpacing: '0.04em', marginBottom: '20px' }}>
+          <p style={{ color: 'var(--mf-text-subtle)', fontSize: '13px', fontWeight: 200, letterSpacing: '0.04em', marginBottom: '20px' }}>
             o diário continua aceitando novas páginas.
           </p>
           <div className="tarja-field" style={{ maxWidth: '240px', margin: '0 auto 24px' }}>
-            <TarjaSvg fill="transparent" stroke="#2a1212" />
+            <TarjaSvg fill="transparent" stroke="var(--mf-border-tarja)" />
             <a
               href="#formulario"
               className="font-brand"
               style={{
                 position: 'absolute', inset: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#555555', fontWeight: 400,
+                color: 'var(--mf-text-subtle)', fontWeight: 400,
                 letterSpacing: '0.10em', textTransform: 'uppercase',
                 fontSize: '0.75rem', textDecoration: 'none',
               }}
@@ -245,9 +245,9 @@ export default function FiorettesPage() {
               deixar uma página
             </a>
           </div>
-          <p style={{ color: '#555555', fontSize: '11px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.7 }}>
+          <p style={{ color: 'var(--mf-text-subtle)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.7 }}>
             ao enviar, você concorda com nossa{' '}
-            <a href="/privacidade" style={{ color: '#555555', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+            <a href="/privacidade" style={{ color: 'var(--mf-text-subtle)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
               política de privacidade
             </a>
             .<br />

@@ -21,7 +21,7 @@
   }
 
   ::selection {
-    background-color: rgba(204, 32, 32, 0.35);
+    background-color: var(--mf-color-selection);
     color: #E8E8E8;
   }
 }
@@ -31,28 +31,25 @@
   /* ─── Typography ─── */
 
   .headline-glow {
-    color: #CC2020;
+    color: var(--mf-text-brand);
     letter-spacing: 0.08em;
-    text-shadow:
-      0 0 18px rgba(160, 8,  8,  0.80),
-      0 0 45px rgba(120, 4,  4,  0.50),
-      0 0 90px rgba(80,  0,  0,  0.25);
+    text-shadow: var(--mf-fx-landing-glow-headline);
+  }
+
+  /* Titulo vermelho em letra pequena (menos de 19px): blood-lt, 4,5:1 ou mais */
+  .headline-glow-sm {
+    color: var(--mf-text-brand-small);
   }
 
   .subheadline-glow {
-    text-shadow:
-      0 0 16px rgba(140, 6,  6,  0.65),
-      0 0 40px rgba(90,  0,  0,  0.30);
+    text-shadow: var(--mf-fx-landing-glow-subheadline);
   }
 
   .logo-glow {
-    filter:
-      drop-shadow(0 0 8px  rgba(180, 130, 0, 0.70))
-      drop-shadow(0 0 22px rgba(120, 80,  0, 0.40))
-      drop-shadow(0 0 50px rgba(70,  45,  0, 0.18));
+    filter: var(--mf-fx-landing-glow-logo);
   }
 
-  /* ─── Tarja field height — responsive ─── */
+  /* ─── Tarja field height: responsive ─── */
 
   .tarja-field {
     position: relative;
@@ -63,6 +60,43 @@
     .tarja-field {
       height: 44px;
     }
+  }
+
+  /* Desktop baixo (ate 980px de altura): a pagina nao rola, entao a tarja desce de 90 para 72px
+     para o rodape de 12px caber inteiro. Acima disso vale o token (90px). */
+  @media (min-width: 640px) and (max-height: 980px) {
+    .tarja-field {
+      height: 72px;
+    }
+  }
+
+  /* ─── Tarja em 3 fatias (design system, D11): a ponta arredondada nao distorce, so o miolo estica ─── */
+
+  .tarja-forma {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    pointer-events: none;
+  }
+
+  .tarja-forma > svg {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    flex: none;
+  }
+
+  .tarja-forma__l,
+  .tarja-forma__r {
+    aspect-ratio: 16 / 30;
+    width: auto;
+  }
+
+  .tarja-forma > .tarja-forma__m {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+    margin-inline: -0.5px;
   }
 
   /* ─── Fiorettes ticker ─── */
@@ -101,7 +135,7 @@
 
   .fiorettes-input::placeholder,
   .fiorettes-textarea::placeholder {
-    color: #7A4848;
+    color: var(--mf-text-placeholder);
     font-weight: 200;
     letter-spacing: 0.02em;
   }
@@ -125,7 +159,7 @@
   }
 
   .tarja-input::placeholder {
-    color: #7A4848;
+    color: var(--mf-text-placeholder);
     font-weight: 200;
     letter-spacing: 0.04em;
   }
@@ -133,7 +167,7 @@
   .tarja-input:-webkit-autofill,
   .tarja-input:-webkit-autofill:hover,
   .tarja-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #0a0000 inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--mf-bg-field) inset;
     -webkit-text-fill-color: #E8E8E8;
     transition: background-color 5000s ease-in-out 0s;
   }
@@ -141,15 +175,22 @@
   /* ─── Tarja button glow ─── */
 
   @keyframes ctaBreathDrop {
-    0%, 100% { filter: drop-shadow(0 0 8px rgba(204, 32, 32, 0.30)); }
-    50%       { filter: drop-shadow(0 0 22px rgba(204, 32, 32, 0.58)); }
+    0%, 100% { filter: var(--mf-fx-glow-cta-low); }
+    50%       { filter: var(--mf-fx-glow-cta-high); }
+  }
+
+  /* Hover do CTA: so em ponteiro fino (design system) */
+  @media (hover: hover) and (pointer: fine) {
+    .tarja-btn-glow:has(.tarja-cta:hover) .tarja-forma {
+      fill: var(--mf-accent-hover) !important;
+    }
   }
 
   .tarja-btn-glow {
     animation: ctaBreathDrop 3.2s ease-in-out infinite;
   }
 
-  /* ─── Camera flash — red carpet ─── */
+  /* ─── Camera flash: red carpet ─── */
 
   @keyframes cameraFlash {
     0%, 91%, 100% { opacity: 0; }
@@ -211,55 +252,55 @@
     will-change: transform;
   }
 
-  /* Vermelho sangue — top left */
+  /* Vermelho sangue: top left */
   .bg-blob-1 {
     width: 75vw;
     height: 75vw;
     max-width: 640px;
     max-height: 640px;
-    background: radial-gradient(circle, rgba(210, 14, 14, 0.58) 0%, rgba(160, 8, 8, 0.30) 45%, transparent 68%);
+    background: var(--mf-fx-bg-blob-blood-a);
     top: -4vw;
     left: -2vw;
     animation: blob1 3.5s ease-in-out infinite;
   }
 
-  /* Vermelho sangue — bottom right */
+  /* Vermelho sangue: bottom right */
   .bg-blob-2 {
     width: 65vw;
     height: 65vw;
     max-width: 560px;
     max-height: 560px;
-    background: radial-gradient(circle, rgba(180, 10, 10, 0.50) 0%, rgba(120, 6, 6, 0.22) 50%, transparent 68%);
+    background: var(--mf-fx-bg-blob-blood-b);
     bottom: -4vw;
     right: -4vw;
     animation: blob2 4.5s ease-in-out infinite;
   }
 
-  /* Carmesim — centro */
+  /* Carmesim: centro */
   .bg-blob-3 {
     width: 55vw;
     height: 55vw;
     max-width: 480px;
     max-height: 480px;
-    background: radial-gradient(circle, rgba(150, 10, 10, 0.38) 0%, rgba(100, 5, 5, 0.15) 55%, transparent 70%);
+    background: var(--mf-fx-bg-blob-carmine);
     top: 28%;
     left: 22%;
     animation: blob3 5.5s ease-in-out infinite;
   }
 
-  /* Amarelo — acento top right */
+  /* Amarelo: acento top right */
   .bg-blob-4 {
     width: 45vw;
     height: 45vw;
     max-width: 400px;
     max-height: 400px;
-    background: radial-gradient(circle, rgba(255, 240, 4, 0.08) 0%, transparent 70%);
+    background: var(--mf-fx-bg-blob-yellow);
     top: -5%;
     right: -5%;
     animation: blob4 4s ease-in-out infinite;
   }
 
-  /* ─── Film grain — triplo ─── */
+  /* ─── Film grain: triplo ─── */
 
   @keyframes grain {
     0%   { background-position:   0px   0px; }
@@ -295,7 +336,7 @@
     justify-content: center;
   }
 
-  /* Bloom ambiente dourado — por trás */
+  /* Bloom ambiente dourado: por trás */
   @keyframes goldenBloom {
     0%, 100% { opacity: 0.45; transform: scale(1); }
     50%       { opacity: 0.70; transform: scale(1.08); }
@@ -347,12 +388,12 @@
   .delay-650 { animation-delay: 0.65s; }
   .delay-800 { animation-delay: 0.80s; }
 
-  /* ─── Focus visible — acessibilidade de teclado ─── */
+  /* ─── Focus visible: acessibilidade de teclado ─── */
 
   .focus-ring:focus-visible {
-    outline: 2px solid #CC2020;
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline: 2px solid var(--mf-focus-ring);
+    outline-offset: var(--mf-focus-ring-offset);
+    border-radius: var(--mf-radius-control);
   }
 
   /* ─── Reduced motion ─── */

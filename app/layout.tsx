@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import Script from 'next/script'
 import { GA4_ATIVO, GA4_ID } from '@/lib/ga4'
+import { TarjaDefs } from '@/components/TarjaSvg'
+import './tokens.melfiore.css'
 import './globals.css'
 
 const brother1816 = localFont({
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={brother1816.variable}>
       <body className="font-brand bg-brand-bg min-h-screen">
+        <TarjaDefs />
         {children}
         {GA4_ATIVO && (
           <>

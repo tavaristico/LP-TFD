@@ -5,6 +5,16 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 16/11/2026: tokens do design system no site (nada publicado)
+
+- `app/tokens.melfiore.css` (novo): copia de `DESIGN-SYSTEM/dist/lp-tfd` (feat/decisoes-16-11, 5d42ed0) sem os `@font-face`; a fonte segue self-hosted no `layout.tsx`. Entra por `import` no `layout.tsx`. O consumidor `lp-tfd` do sync segue `enabled:false`.
+- Vermelho blood `#8B1A1A` (hover `#741515`, busy `#5E1212`), blood-ui `#C82F2F` (titulo, foco, contorno), blood-lt `#D95C5C` (letra pequena), gold, raios 8/12/16, flat, `--mf-text-tier-*`, `--mf-text-footer`, `--mf-border-soft`, `--mf-bg-hover`. `tailwind.config.ts`, `app/globals.css`, `WaitlistForm`, `FiorettesForm`, `app/page.tsx`, `app/fiorettes/page.tsx`, e-mail de `app/api/fiorettes/route.ts` apontam para os tokens.
+- `components/TarjaSvg.tsx`: tarja em 3 fatias (`#mf-tarja-d` definido uma vez em `layout.tsx` por `TarjaDefs`). Ponta nao distorce.
+- Contraste: `#7A4848` vira `--mf-color-mauve-lt`, `#555555` e `#444444` viram `--mf-text-subtle`, vermelho pequeno vira blood-lt, rodape 10px a 50% vira 12px a 85%, aceite 11px vira 12px.
+- Decisao visual: acima de 640px e ate 980px de altura a tarja desce de 90 para 72px (`globals.css`), porque a home nao rola e o rodape de 12px nao cabia em 1440x900. Fora disso vale 90px.
+- `app/privacidade/page.tsx`: sem travessao; hospedagem cita Cloudflare, Inc. (o site roda no Worker, `wrangler.jsonc`). `/fiorettes`: titulo e placeholder sem travessao. `COPY.md` 1.10.
+- Capturas: `_DOCS/SITE-OFICIAL/MEDUSA-VPS/pesquisa/2026-11-16-lp-tokens-screens/`.
+
 ## 16/11/2026: aceite cobre celular e dados da compra; fim da afirmacao de criptografia (nada publicado)
 
 - `lib/aceite-waitlist.ts`: texto novo (versao `waitlist-2026-11-16`): cobre e-mail e celular informados e diz que CPF e endereco do pedido ficam no cadastro da loja, so para entrega, nota e atendimento, nunca vendidos nem usados em anuncio.

@@ -59,7 +59,7 @@ export default function Home() {
       {/* ── Film grain ── */}
       <div aria-hidden className="grain-overlay" style={{ zIndex: 2 }} />
 
-      {/* ── Main content — tudo centralizado como bloco único ── */}
+      {/* ── Main content: tudo centralizado como bloco único ── */}
       <main
         className="relative flex flex-col items-center justify-center px-6 text-center"
         style={{ zIndex: 3 }}
@@ -83,9 +83,10 @@ export default function Home() {
         </div>
 
         <h1
-          className="headline-glow font-normal anim-fade-up delay-200"
+          className="headline-glow anim-fade-up delay-200"
           style={{
-            fontSize: 'clamp(1rem, 2.34vw, 1.3rem)',
+            fontSize: 'var(--mf-hero-size)',
+            fontWeight: 'var(--mf-hero-weight)',
             maxWidth: '32rem',
             marginBottom: '0.35rem',
             lineHeight: 1.3,
@@ -109,14 +110,13 @@ export default function Home() {
       >
         <p
           style={{
-            color: '#7A4848',
-            fontSize: '10px',
-            fontWeight: 200,
+            color: 'var(--mf-text-footer)',
+            fontSize: '12px',
+            fontWeight: 300,
             letterSpacing: '0.07em',
             textTransform: 'uppercase',
             textAlign: 'center',
             lineHeight: 1.65,
-            opacity: 0.5,
           }}
         >
           MELFIORE © 2026 .TBF. inc. All rights reserved

@@ -1,0 +1,569 @@
+/* Copia de 2. MELFIORE/DESIGN-SYSTEM/dist/lp-tfd/tokens.melfiore.css (branch feat/decisoes-16-11, 5d42ed0), sem os @font-face: a fonte segue self-hosted via next/font em layout.tsx. Regerar do design system, nao editar aqui. */
+/* =============================================================================
+   ARQUIVO GERADO. NAO EDITE.
+   Consumidor: LP-TFD (melfiore.com e /fiorettes)
+   Fonte:      2. MELFIORE/DESIGN-SYSTEM/tokens/melfiore.tokens.css
+   Hash:       sha256:1ce28537e57b
+   Camada local do produto (nao vem daqui): app/globals.css
+   Editar aqui perde o trabalho no proximo sync, e o --check acusa.
+   ============================================================================= */
+
+/* =============================================================================
+   MELFIORE DESIGN SYSTEM: tokens canonicos
+   Prefixo --mf- em 100%. Duas camadas: 1 Primitivo, 2 Semantico.
+   A camada de Componente NAO mora aqui: ver components/ e o repo de cada produto.
+
+   Regras de escrita (o sync le este arquivo):
+   - uma declaracao por linha
+   - camada marcada por uma linha propria com o marcador @layer:primitive ou @layer:semantic
+   - mobile-first: o valor base e o de 390px; @media (min-width) so SOBE
+
+   Origem de cada valor: README.md (canonico) e DIVERGENCIAS.md (o que e provisorio).
+   Decisoes D01 a D19 fechadas em 06/11/2026 (LAUDO-DIVERGENCIAS-2026-11-06.md).
+   Rodada de 16/11/2026: as 19 decididas pelo fundador (preview/feedback-decisoes-2026-11-16.json). Flat e clean,
+   raio suave, vermelho de marca #8B1A1A (D19), opacidade do texto atrelada a escala tipografica (D01).
+   ============================================================================= */
+
+/*@layer:primitive*/
+
+:root {
+  /* ---- 1.1 Cor (fonte: _DOCS/LP/DESIGN_TOKENS.md e CSS real do LP-TFD) ---- */
+  --mf-color-void:         #000000;  /* fundo da pagina */
+  --mf-color-ink:          #0A0A0A;  /* superficie */
+  --mf-color-ash:          #111111;  /* rodape */
+  --mf-color-line:         #1A1A1A;  /* borda, divisor, superficie elevada */
+  --mf-color-tarja-fill:   #0A0000;  /* preenchimento da tarja (campo) */
+  --mf-color-tarja-edge:   #2A1212;  /* contorno da tarja em repouso */
+  --mf-color-bone:         #E8E8E8;  /* texto primario */
+  --mf-color-white:        #FFFFFF;
+  --mf-color-silver:       #AAAAAA;  /* texto discreto que passa AA */
+  --mf-color-slate:        #666666;  /* DESIGN_TOKENS: texto discreto (reprova AA, nunca usar, D01) */
+  --mf-color-graphite:     #555555;  /* CSS real: texto discreto (reprova AA, nunca usar, D01) */
+  --mf-color-soot:         #333333;  /* COPY 1.14: rodape (reprova AA) */
+  --mf-color-mauve:        #7A4848;  /* CSS real: placeholder (reprova AA) */
+  --mf-color-blood:        #8B1A1A;  /* vermelho de marca (D19, 16/11/2026): fundo de CTA e mancha. Em texto e traco, so as derivadas -ui e -lt */
+  --mf-color-blood-deep:   #741515;  /* CTA hover (11,29:1 com texto branco) */
+  --mf-color-blood-wine:   #5E1212;  /* CTA carregando (13,37:1 com texto branco) */
+  --mf-color-blood-dim:    #6B1515;  /* so primitivo, nunca cor de texto (D02) */
+  --mf-color-alarm:        #FF4444;  /* erro de campo */
+  --mf-color-yellow:       #FFF004;  /* assinatura: so o nome e o traco */
+  --mf-color-graphite-lt:  #8F8F8F;  /* texto sutil que passa AA (D01) */
+  --mf-color-mauve-lt:     #B07A7A;  /* placeholder que passa AA (D03) */
+  --mf-color-blood-lt:     #D95C5C;  /* vermelho legivel em texto pequeno, 4,66:1 no pior fundo (D04, recalculado em 16/11) */
+  --mf-color-blood-ui:     #C82F2F;  /* vermelho de contorno, foco e titulo grande, 3,24:1 no pior fundo (D04, D19) */
+  --mf-color-gold:         #FFD700;  /* dourado do link de convite (D08, landing). Nao e o amarelo da assinatura */
+  --mf-color-steel:        #6E6E6E;  /* contorno de controle, 3:1 (D06) */
+  --mf-color-moss:         #5DBB84;  /* marca de sucesso, SO NA CABINE (D07) */
+  --mf-color-ochre:        #D98A2B;  /* aviso, SO NA CABINE; nunca encosta no logo (D07) */
+
+  /* ---- 1.2 Familia ---- */
+  --mf-font-family-brand:   'Brother1816', system-ui, sans-serif;
+  --mf-font-family-printed: 'Brother1816Printed', 'Brother1816', system-ui, sans-serif;
+
+  /* ---- 1.3 Tamanho de fonte (rem; 1rem = 16px) ---- */
+  --mf-font-size-raw-11: 0.6875rem;
+  --mf-font-size-raw-12: 0.75rem;
+  --mf-font-size-raw-14: 0.875rem;
+  --mf-font-size-raw-15: 0.9375rem;
+  --mf-font-size-raw-16: 1rem;
+  --mf-font-size-raw-18: 1.125rem;
+  --mf-font-size-raw-20: 1.25rem;
+  --mf-font-size-raw-24: 1.5rem;
+  --mf-font-size-raw-28: 1.75rem;
+  --mf-font-size-raw-32: 2rem;
+  --mf-font-size-raw-38: 2.4rem;
+  --mf-font-size-raw-40: 2.5rem;
+  --mf-font-size-raw-64: 4rem;
+
+  /* ---- 1.4 Peso (os 5 woff2 que existem em fonts/) ---- */
+  --mf-font-weight-raw-300: 300;
+  --mf-font-weight-raw-400: 400;
+  --mf-font-weight-raw-500: 500;
+  --mf-font-weight-raw-700: 700;
+  --mf-font-weight-raw-900: 900;
+
+  /* ---- 1.5 Entrelinha ---- */
+  --mf-line-height-raw-10: 1;
+  --mf-line-height-raw-11: 1.1;
+  --mf-line-height-raw-12: 1.2;
+  --mf-line-height-raw-14: 1.4;
+  --mf-line-height-raw-15: 1.5;
+  --mf-line-height-raw-16: 1.6;
+
+  /* ---- 1.6 Tracking ---- */
+  --mf-letter-spacing-raw-tight-2: -0.02em;
+  --mf-letter-spacing-raw-none:    0em;
+  --mf-letter-spacing-raw-wide-2:  0.02em;
+  --mf-letter-spacing-raw-wide-4:  0.04em;
+  --mf-letter-spacing-raw-wide-8:  0.08em;
+  --mf-letter-spacing-raw-wide-10: 0.1em;
+
+  /* ---- 1.7 Espaco (base 4px) ---- */
+  --mf-space-raw-4:   0.25rem;
+  --mf-space-raw-8:   0.5rem;
+  --mf-space-raw-12:  0.75rem;
+  --mf-space-raw-16:  1rem;
+  --mf-space-raw-20:  1.25rem;
+  --mf-space-raw-24:  1.5rem;
+  --mf-space-raw-32:  2rem;
+  --mf-space-raw-40:  2.5rem;
+  --mf-space-raw-48:  3rem;
+  --mf-space-raw-64:  4rem;
+  --mf-space-raw-80:  5rem;
+  --mf-space-raw-120: 7.5rem;
+
+  /* ---- 1.8 Motion: duracao ---- */
+  --mf-duration-raw-100:  100ms;
+  --mf-duration-raw-150:  150ms;
+  --mf-duration-raw-200:  200ms;
+  --mf-duration-raw-250:  250ms;
+  --mf-duration-raw-300:  300ms;
+  --mf-duration-raw-800:  800ms;
+  --mf-duration-raw-3200: 3200ms;
+
+  /* ---- 1.9 Motion: easing (o nome e o papel, o valor e a decisao) ---- */
+  --mf-easing-raw-ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --mf-easing-raw-ease-in:     ease-in;
+  --mf-easing-raw-ease-in-out: ease-in-out;
+  --mf-easing-raw-linear:      linear;
+
+  /* ---- 1.10 Radius ---- */
+  --mf-radius-raw-0:    0;
+  --mf-radius-raw-2:    2px;
+  --mf-radius-raw-4:    4px;
+  --mf-radius-raw-8:    8px;
+  --mf-radius-raw-12:   12px;
+  --mf-radius-raw-16:   16px;
+  --mf-radius-raw-full: 999px;
+
+  /* ---- 1.11 Z-index ---- */
+  --mf-z-raw-base:    0;
+  --mf-z-raw-content: 10;
+  --mf-z-raw-overlay: 20;
+  --mf-z-raw-sticky:  30;
+  --mf-z-raw-drawer:  40;
+  --mf-z-raw-modal:   50;
+  --mf-z-raw-toast:   60;
+
+  /* ---- 1.12 Breakpoint (referencia: CSS nao le var() em @media) ---- */
+  --mf-bp-raw-base: 390px;
+  --mf-bp-raw-md:   768px;
+  --mf-bp-raw-lg:   1024px;
+  --mf-bp-raw-xl:   1280px;
+
+  /* ---- 1.13 Insumos da landing (11/11/2026): so acrescenta, nenhum valor antigo muda ----
+     Fonte: LP-TFD app/globals.css e components/WaitlistForm.tsx. Inventario: docs/landing-como-base.md */
+  --mf-color-tarja-deep:   #030000;  /* tarja carregando (WaitlistForm.tsx:70) */
+  --mf-color-selection:    rgba(200, 47, 47, 0.35);  /* texto selecionado (globals.css:24) */
+  --mf-duration-raw-350:   350ms;
+  --mf-duration-raw-500:   500ms;
+  --mf-duration-raw-600:   600ms;
+  --mf-duration-raw-650:   650ms;
+  --mf-duration-raw-2800:  2800ms;
+  --mf-duration-raw-3500:  3500ms;
+  --mf-duration-raw-4000:  4000ms;
+  --mf-duration-raw-4500:  4500ms;
+  --mf-duration-raw-5500:  5500ms;
+  --mf-space-raw-6:   0.375rem;
+  --mf-space-raw-14:  0.875rem;
+  --mf-space-raw-18:  1.125rem;
+  --mf-space-raw-44:  2.75rem;
+  --mf-space-raw-90:  5.625rem;
+  --mf-line-height-raw-13: 1.3;
+  --mf-letter-spacing-raw-wide-15: 0.15em;
+}
+
+/*@layer:semantic*/
+
+:root {
+  color-scheme: dark;
+
+  /* ---- 2.1 Fundo ---- */
+  --mf-bg-page:        var(--mf-color-void);
+  --mf-bg-surface:     var(--mf-color-ink);
+  --mf-bg-raised:      var(--mf-color-line);
+  --mf-bg-footer:      var(--mf-color-ash);
+  --mf-bg-hover:       #242424;  /* hover de botao secundario e linha (flat: sobe um degrau de tom) */
+  --mf-bg-field:       var(--mf-color-tarja-fill);
+  --mf-bg-inverse:     var(--mf-color-white);
+  --mf-bg-scrim:       rgba(0, 0, 0, 0.72);
+
+  /* ---- 2.2 Texto ---- */
+  --mf-text-primary:     var(--mf-color-bone);
+  --mf-text-secondary:   var(--mf-color-silver);
+  --mf-text-subtle:      var(--mf-color-graphite-lt);
+  --mf-text-placeholder: var(--mf-color-mauve-lt);
+  --mf-text-brand:       var(--mf-color-blood-ui);  /* titulo grande (24px, ou 19px peso 700): 3,9:1 no preto */
+  --mf-text-brand-small: var(--mf-color-blood-lt);
+  --mf-text-on-brand:    var(--mf-color-white);
+  --mf-text-on-inverse:  var(--mf-color-void);
+  --mf-text-signature:   var(--mf-color-yellow);
+  --mf-text-invite-link: var(--mf-color-gold);
+
+  /* ---- 2.2b Opacidade do texto atrelada a escala tipografica (D01, 16/11/2026) ----
+     Quanto menor a letra, menor a opacidade do bone sobre o fundo. Piso 0,60: abaixo disso o texto corrido
+     perde 4,5:1 no pior fundo (#1A1A1A). A escala sobe e desce junto: titulo 1,00 ... legenda 0,66.
+     Cada degrau e um valor pronto (o sync nao calcula); o contraste de cada um e testado em tools/contrast.mjs. */
+  --mf-text-alpha-floor:   0.6;
+  --mf-text-tier-title:    #E8E8E8;
+  --mf-text-tier-heading:  rgba(232, 232, 232, 0.96);
+  --mf-text-tier-subhead:  rgba(232, 232, 232, 0.92);
+  --mf-text-tier-body:     rgba(232, 232, 232, 0.88);
+  --mf-text-tier-label:    rgba(232, 232, 232, 0.78);
+  --mf-text-tier-caption:  rgba(232, 232, 232, 0.66);
+  /* D05 (landing, opacidade mais alta): rodape no tom vinho da landing, de 50% para 85%, e o mauve clareado (#BE8484) para passar AA (4,74:1) */
+  --mf-text-footer:        rgba(190, 132, 132, 0.85);
+
+  /* ---- 2.3 Acento e interacao ---- */
+  --mf-accent:               var(--mf-color-blood);
+  --mf-accent-hover:         var(--mf-color-blood-deep);
+  --mf-accent-busy:          var(--mf-color-blood-wine);
+  --mf-accent-signature:     var(--mf-color-yellow);
+  --mf-border:               var(--mf-color-line);
+  --mf-border-soft:          rgba(255, 255, 255, 0.06);  /* D12: linhas de tabela e divisor, mais leves que --mf-border */
+  --mf-border-control:       var(--mf-color-steel);
+  --mf-border-tarja:         var(--mf-color-tarja-edge);
+  --mf-border-active:        var(--mf-color-blood-ui);
+  --mf-focus-ring:           var(--mf-color-blood-ui);
+  --mf-focus-ring-width:     2px;
+  --mf-focus-ring-offset:    3px;
+
+  /* ---- 2.4 Estados (D07) ----
+     Cabine (CRM, painel, portal do fornecedor): ponto, borda e fundo a 12%, nunca cor de texto.
+     Vitrine, checkout, conta e e-mail da cliente: estado so por palavra, em bone, silver e alarm.
+     Verde (success-mark) e laranja (warning) NAO existem fora da cabine. */
+  --mf-state-success:        var(--mf-color-bone);
+  --mf-state-success-mark:   var(--mf-color-moss);
+  --mf-state-success-bg:     rgba(93, 187, 132, 0.12);
+  --mf-state-error:          var(--mf-color-alarm);
+  --mf-state-error-bg:       rgba(255, 68, 68, 0.12);
+  --mf-state-error-bg-hover: rgba(255, 68, 68, 0.2);
+  --mf-state-brand-bg:       rgba(200, 47, 47, 0.16);
+  --mf-state-warning:        var(--mf-color-ochre);
+  --mf-state-warning-bg:     rgba(217, 138, 43, 0.12);
+  --mf-state-info:           var(--mf-color-silver);
+  --mf-state-info-bg:        rgba(170, 170, 170, 0.10);
+  --mf-state-disabled-opacity: 0.7;
+
+  /* ---- 2.5 Forma (D11, 16/11/2026): cantos suaves sempre, flat ----
+     --mf-radius-soft e o raio base. Todo componente aponta para um dos quatro papeis abaixo, nunca para um primitivo.
+     Tarja SVG nao usa estes tokens: o canto arredondado e o do desenho, sem distorcer (fatias, ver components/22-tarja.md).
+     --mf-radius-pill so para bolinha, avatar, radio e etiqueta. Sem sombra dura, sem bevel, sem borda dupla. */
+  --mf-radius-soft:    var(--mf-radius-raw-8);
+  --mf-radius-control: var(--mf-radius-soft);
+  --mf-radius-cta:     var(--mf-radius-soft);
+  --mf-radius-card:    var(--mf-radius-raw-12);
+  --mf-radius-media:   var(--mf-radius-raw-12);
+  --mf-radius-sheet:   var(--mf-radius-raw-16);
+  --mf-radius-pill:    var(--mf-radius-raw-full);
+
+  /* ---- 2.6 Camadas ---- */
+  --mf-z-sticky:  var(--mf-z-raw-sticky);
+  --mf-z-drawer:  var(--mf-z-raw-drawer);
+  --mf-z-modal:   var(--mf-z-raw-modal);
+  --mf-z-toast:   var(--mf-z-raw-toast);
+
+  /* ---- 2.7 Espaco: pagina e pilha ---- */
+  --mf-gutter:       var(--mf-space-raw-20);
+  --mf-container-max: 1280px;
+  --mf-stack-xs: var(--mf-space-raw-8);
+  --mf-stack-sm: var(--mf-space-raw-16);
+  --mf-stack-md: var(--mf-space-raw-24);
+  --mf-stack-lg: var(--mf-space-raw-48);
+  --mf-stack-xl: var(--mf-space-raw-80);
+  --mf-touch-min: 44px;
+
+  /* ---- 2.8 Motion ---- */
+  --mf-motion-press:    var(--mf-duration-raw-100);
+  --mf-motion-micro:    var(--mf-duration-raw-150);
+  --mf-motion-element:  var(--mf-duration-raw-200);
+  --mf-motion-overlay:  var(--mf-duration-raw-250);
+  --mf-motion-reveal:   var(--mf-duration-raw-800);
+  --mf-motion-ambient:  var(--mf-duration-raw-3200);
+  --mf-ease-enter:      var(--mf-easing-raw-ease-out);
+  --mf-ease-exit:       var(--mf-easing-raw-ease-in);
+  --mf-ease-move:       var(--mf-easing-raw-ease-in-out);
+  --mf-ease-hover:      ease;
+  --mf-ease-constant:   var(--mf-easing-raw-linear);
+  --mf-press-scale:     0.97;
+  --mf-enter-scale:     0.95;
+
+  /* ---- 2.9 Efeito de marca ---- */
+  --mf-fx-glow-headline:  0 0 20px rgba(200, 47, 47, 0.55), 0 0 45px rgba(200, 47, 47, 0.32), 0 0 80px rgba(139, 26, 26, 0.25);
+  --mf-fx-glow-cta:       0 0 22px rgba(139, 26, 26, 0.7);
+  --mf-fx-glow-logo:      drop-shadow(0 0 8px rgba(180, 130, 0, 0.7)) drop-shadow(0 0 22px rgba(120, 80, 0, 0.4));
+  --mf-fx-focus-halo:     none;  /* flat (16/11): o anel de foco e o outline, sem halo */
+  --mf-fx-error-halo:     none;
+  --mf-fx-shadow-raised:  none;  /* flat (16/11): elevacao por tom de fundo, nunca por sombra */
+  --mf-fx-blob-blood:     rgba(139, 26, 26, 0.75);
+  --mf-fx-blob-carmine:   rgba(100, 16, 16, 0.5);
+  --mf-fx-blob-yellow:    rgba(255, 240, 4, 0.08);
+  --mf-fx-grain-opacity:  0.2;
+
+  /* ---- 2.10 Escala VITRINE (site e loja): editorial, respiro ---- */
+  --mf-vitrine-display-family:   var(--mf-font-family-brand);
+  --mf-vitrine-display-size:     var(--mf-font-size-raw-38);
+  --mf-vitrine-display-weight:   var(--mf-font-weight-raw-900);
+  --mf-vitrine-display-leading:  var(--mf-line-height-raw-11);
+  --mf-vitrine-display-tracking: var(--mf-letter-spacing-raw-wide-8);
+
+  --mf-vitrine-title-family:   var(--mf-font-family-brand);
+  --mf-vitrine-title-size:     var(--mf-font-size-raw-28);
+  --mf-vitrine-title-weight:   var(--mf-font-weight-raw-900);
+  --mf-vitrine-title-leading:  var(--mf-line-height-raw-11);
+  --mf-vitrine-title-tracking: var(--mf-letter-spacing-raw-tight-2);
+
+  --mf-vitrine-heading-family:   var(--mf-font-family-brand);
+  --mf-vitrine-heading-size:     var(--mf-font-size-raw-20);
+  --mf-vitrine-heading-weight:   var(--mf-font-weight-raw-700);
+  --mf-vitrine-heading-leading:  var(--mf-line-height-raw-12);
+  --mf-vitrine-heading-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-vitrine-subhead-family:   var(--mf-font-family-brand);
+  --mf-vitrine-subhead-size:     var(--mf-font-size-raw-16);
+  --mf-vitrine-subhead-weight:   var(--mf-font-weight-raw-700);
+  --mf-vitrine-subhead-leading:  var(--mf-line-height-raw-15);
+  --mf-vitrine-subhead-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-vitrine-body-family:   var(--mf-font-family-brand);
+  --mf-vitrine-body-size:     var(--mf-font-size-raw-16);
+  --mf-vitrine-body-weight:   var(--mf-font-weight-raw-400);
+  --mf-vitrine-body-leading:  var(--mf-line-height-raw-16);
+  --mf-vitrine-body-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-vitrine-label-family:   var(--mf-font-family-brand);
+  --mf-vitrine-label-size:     var(--mf-font-size-raw-14);
+  --mf-vitrine-label-weight:   var(--mf-font-weight-raw-400);
+  --mf-vitrine-label-leading:  var(--mf-line-height-raw-14);
+  --mf-vitrine-label-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-vitrine-caption-family:   var(--mf-font-family-brand);
+  --mf-vitrine-caption-size:     var(--mf-font-size-raw-12);
+  --mf-vitrine-caption-weight:   var(--mf-font-weight-raw-300);
+  --mf-vitrine-caption-leading:  var(--mf-line-height-raw-14);
+  --mf-vitrine-caption-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-vitrine-control-family:   var(--mf-font-family-brand);
+  --mf-vitrine-control-size:     var(--mf-font-size-raw-16);
+  --mf-vitrine-control-weight:   var(--mf-font-weight-raw-700);
+  --mf-vitrine-control-leading:  var(--mf-line-height-raw-10);
+  --mf-vitrine-control-tracking: var(--mf-letter-spacing-raw-wide-2);
+
+  --mf-vitrine-control-height: 52px;
+  --mf-vitrine-control-pad-x:  var(--mf-space-raw-20);
+
+  /* ---- 2.11 Escala CABINE (CRM, painel): densa, dado primeiro ---- */
+  --mf-cabine-title-family:   var(--mf-font-family-brand);
+  --mf-cabine-title-size:     var(--mf-font-size-raw-24);
+  --mf-cabine-title-weight:   var(--mf-font-weight-raw-700);
+  --mf-cabine-title-leading:  var(--mf-line-height-raw-12);
+  --mf-cabine-title-tracking: var(--mf-letter-spacing-raw-tight-2);
+
+  --mf-cabine-heading-family:   var(--mf-font-family-brand);
+  --mf-cabine-heading-size:     var(--mf-font-size-raw-18);
+  --mf-cabine-heading-weight:   var(--mf-font-weight-raw-700);
+  --mf-cabine-heading-leading:  var(--mf-line-height-raw-12);
+  --mf-cabine-heading-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-cabine-body-family:   var(--mf-font-family-brand);
+  --mf-cabine-body-size:     var(--mf-font-size-raw-16);
+  --mf-cabine-body-weight:   var(--mf-font-weight-raw-400);
+  --mf-cabine-body-leading:  var(--mf-line-height-raw-15);
+  --mf-cabine-body-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-cabine-data-family:   var(--mf-font-family-brand);
+  --mf-cabine-data-size:     var(--mf-font-size-raw-14);
+  --mf-cabine-data-weight:   var(--mf-font-weight-raw-400);
+  --mf-cabine-data-leading:  var(--mf-line-height-raw-14);
+  --mf-cabine-data-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-cabine-label-family:   var(--mf-font-family-brand);
+  --mf-cabine-label-size:     var(--mf-font-size-raw-12);
+  --mf-cabine-label-weight:   var(--mf-font-weight-raw-500);
+  --mf-cabine-label-leading:  var(--mf-line-height-raw-14);
+  --mf-cabine-label-tracking: var(--mf-letter-spacing-raw-wide-4);
+
+  --mf-cabine-caption-family:   var(--mf-font-family-brand);
+  --mf-cabine-caption-size:     var(--mf-font-size-raw-12);
+  --mf-cabine-caption-weight:   var(--mf-font-weight-raw-400);
+  --mf-cabine-caption-leading:  var(--mf-line-height-raw-14);
+  --mf-cabine-caption-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-cabine-control-family:   var(--mf-font-family-brand);
+  --mf-cabine-control-size:     var(--mf-font-size-raw-16);
+  --mf-cabine-control-weight:   var(--mf-font-weight-raw-500);
+  --mf-cabine-control-leading:  var(--mf-line-height-raw-10);
+  --mf-cabine-control-tracking: var(--mf-letter-spacing-raw-none);
+
+  --mf-cabine-control-height: 44px;
+  --mf-cabine-control-pad-x:  var(--mf-space-raw-12);
+
+  /* ---- 2.12 Papel ativo: o produto escolhe uma escala. Padrao = vitrine ---- */
+  --mf-type-title-family:   var(--mf-vitrine-title-family);
+  --mf-type-title-size:     var(--mf-vitrine-title-size);
+  --mf-type-title-weight:   var(--mf-vitrine-title-weight);
+  --mf-type-title-leading:  var(--mf-vitrine-title-leading);
+  --mf-type-title-tracking: var(--mf-vitrine-title-tracking);
+
+  --mf-type-heading-family:   var(--mf-vitrine-heading-family);
+  --mf-type-heading-size:     var(--mf-vitrine-heading-size);
+  --mf-type-heading-weight:   var(--mf-vitrine-heading-weight);
+  --mf-type-heading-leading:  var(--mf-vitrine-heading-leading);
+  --mf-type-heading-tracking: var(--mf-vitrine-heading-tracking);
+
+  --mf-type-body-family:   var(--mf-vitrine-body-family);
+  --mf-type-body-size:     var(--mf-vitrine-body-size);
+  --mf-type-body-weight:   var(--mf-vitrine-body-weight);
+  --mf-type-body-leading:  var(--mf-vitrine-body-leading);
+  --mf-type-body-tracking: var(--mf-vitrine-body-tracking);
+
+  --mf-type-label-family:   var(--mf-vitrine-label-family);
+  --mf-type-label-size:     var(--mf-vitrine-label-size);
+  --mf-type-label-weight:   var(--mf-vitrine-label-weight);
+  --mf-type-label-leading:  var(--mf-vitrine-label-leading);
+  --mf-type-label-tracking: var(--mf-vitrine-label-tracking);
+
+  --mf-type-caption-family:   var(--mf-vitrine-caption-family);
+  --mf-type-caption-size:     var(--mf-vitrine-caption-size);
+  --mf-type-caption-weight:   var(--mf-vitrine-caption-weight);
+  --mf-type-caption-leading:  var(--mf-vitrine-caption-leading);
+  --mf-type-caption-tracking: var(--mf-vitrine-caption-tracking);
+
+  --mf-type-control-family:   var(--mf-vitrine-control-family);
+  --mf-type-control-size:     var(--mf-vitrine-control-size);
+  --mf-type-control-weight:   var(--mf-vitrine-control-weight);
+  --mf-type-control-leading:  var(--mf-vitrine-control-leading);
+  --mf-type-control-tracking: var(--mf-vitrine-control-tracking);
+
+  --mf-control-height: var(--mf-vitrine-control-height);
+  --mf-control-pad-x:  var(--mf-vitrine-control-pad-x);
+
+  /* ---- 2.13 Fundo da landing: degrade leve com grao (insumo, 11/11/2026) ----
+     Manchas de luz desfocadas sobre preto, marca-d'agua inclinada, grao por cima do degrade. */
+  --mf-fx-bg-blur:            70px;
+  --mf-fx-bg-blob-blood-a:    radial-gradient(circle, rgba(139, 26, 26, 0.75) 0%, rgba(110, 20, 20, 0.36) 45%, transparent 68%);
+  --mf-fx-bg-blob-blood-b:    radial-gradient(circle, rgba(120, 22, 22, 0.62) 0%, rgba(90, 16, 16, 0.26) 50%, transparent 68%);
+  --mf-fx-bg-blob-carmine:    radial-gradient(circle, rgba(100, 16, 16, 0.5) 0%, rgba(80, 12, 12, 0.18) 55%, transparent 70%);
+  --mf-fx-bg-blob-yellow:     radial-gradient(circle, rgba(255, 240, 4, 0.08) 0%, transparent 70%);
+  --mf-fx-bg-watermark-opacity: 0.028;
+  --mf-fx-bg-watermark-blur:  10px;
+  --mf-fx-grain-image:        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  --mf-fx-grain-size:         180px;
+  --mf-fx-flash:              radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 230, 0.72) 12%, rgba(255, 235, 160, 0.30) 35%, rgba(255, 210, 100, 0.07) 58%, transparent 72%);
+  --mf-fx-bloom-logo:         radial-gradient(ellipse, rgba(255, 220, 0, 0.24) 0%, rgba(255, 200, 0, 0.10) 35%, rgba(255, 185, 0, 0.03) 58%, transparent 80%);
+  --mf-motion-blob-1:         var(--mf-duration-raw-3500);
+  --mf-motion-blob-2:         var(--mf-duration-raw-4500);
+  --mf-motion-blob-3:         var(--mf-duration-raw-5500);
+  --mf-motion-blob-4:         var(--mf-duration-raw-4000);
+  --mf-motion-grain-step:     var(--mf-duration-raw-200);
+  --mf-motion-bloom:          var(--mf-duration-raw-2800);
+  --mf-selection-bg:          var(--mf-color-selection);
+
+  /* ---- 2.14 Brilho da landing (variante; o brilho de 2.9 nao muda) ---- */
+  --mf-fx-landing-glow-headline:    0 0 18px rgba(139, 26, 26, 0.85), 0 0 45px rgba(110, 20, 20, 0.55), 0 0 90px rgba(80, 12, 12, 0.3);
+  --mf-fx-landing-glow-subheadline: 0 0 16px rgba(139, 26, 26, 0.7), 0 0 40px rgba(90, 14, 14, 0.32);
+  --mf-fx-landing-glow-logo:        drop-shadow(0 0 8px rgba(180, 130, 0, 0.70)) drop-shadow(0 0 22px rgba(120, 80, 0, 0.40)) drop-shadow(0 0 50px rgba(70, 45, 0, 0.18));
+  --mf-fx-glow-cta-low:             drop-shadow(0 0 8px rgba(139, 26, 26, 0.45));
+  --mf-fx-glow-cta-high:            drop-shadow(0 0 22px rgba(139, 26, 26, 0.85));
+  --mf-motion-glow-breath:          var(--mf-duration-raw-3200);
+
+  /* ---- 2.15 Tarja como campo e botao (insumo, 11/11/2026; ver D13 e D06 em decisoes.html) ----
+     Forma: assets/tarja.svg, viewBox 275 284 292 30, esticada sem manter proporcao, traco de 1px que nao escala. */
+  --mf-tarja-field-height:       var(--mf-space-raw-44);
+  --mf-tarja-field-height-wide:  var(--mf-space-raw-90);
+  --mf-tarja-field-pad-x:        var(--mf-space-raw-18);
+  --mf-bg-field-busy:            var(--mf-color-tarja-deep);
+  --mf-tarja-cta-size:           var(--mf-font-size-raw-14);
+  --mf-tarja-cta-weight:         var(--mf-font-weight-raw-700);
+  --mf-tarja-cta-tracking:       var(--mf-letter-spacing-raw-wide-15);
+  --mf-measure-form:             22rem;
+  --mf-measure-headline:         32rem;
+
+  /* ---- 2.16 Titulo e entrada da landing ---- */
+  --mf-hero-size:     clamp(1.2rem, 2.34vw, 1.5rem);  /* D04: titulo vermelho so de 19px peso 700 para cima */
+  --mf-hero-weight:   var(--mf-font-weight-raw-700);
+  --mf-hero-leading:  var(--mf-line-height-raw-13);
+  --mf-hero-tracking: var(--mf-letter-spacing-raw-wide-8);
+  --mf-rise-distance: var(--mf-space-raw-14);
+  --mf-motion-fade:   var(--mf-duration-raw-600);
+  --mf-stagger-1:     var(--mf-duration-raw-100);
+  --mf-stagger-2:     var(--mf-duration-raw-200);
+  --mf-stagger-3:     var(--mf-duration-raw-350);
+  --mf-stagger-4:     var(--mf-duration-raw-500);
+  --mf-stagger-5:     var(--mf-duration-raw-650);
+  --mf-stagger-6:     var(--mf-duration-raw-800);
+}
+
+/* CABINE: o CRM liga com data-scale="cabine" na raiz do app. Mesmos nomes, outros degraus. */
+[data-scale="cabine"] {
+  --mf-type-title-family:   var(--mf-cabine-title-family);
+  --mf-type-title-size:     var(--mf-cabine-title-size);
+  --mf-type-title-weight:   var(--mf-cabine-title-weight);
+  --mf-type-title-leading:  var(--mf-cabine-title-leading);
+  --mf-type-title-tracking: var(--mf-cabine-title-tracking);
+
+  --mf-type-heading-family:   var(--mf-cabine-heading-family);
+  --mf-type-heading-size:     var(--mf-cabine-heading-size);
+  --mf-type-heading-weight:   var(--mf-cabine-heading-weight);
+  --mf-type-heading-leading:  var(--mf-cabine-heading-leading);
+  --mf-type-heading-tracking: var(--mf-cabine-heading-tracking);
+
+  --mf-type-body-family:   var(--mf-cabine-body-family);
+  --mf-type-body-size:     var(--mf-cabine-body-size);
+  --mf-type-body-weight:   var(--mf-cabine-body-weight);
+  --mf-type-body-leading:  var(--mf-cabine-body-leading);
+  --mf-type-body-tracking: var(--mf-cabine-body-tracking);
+
+  --mf-type-label-family:   var(--mf-cabine-label-family);
+  --mf-type-label-size:     var(--mf-cabine-label-size);
+  --mf-type-label-weight:   var(--mf-cabine-label-weight);
+  --mf-type-label-leading:  var(--mf-cabine-label-leading);
+  --mf-type-label-tracking: var(--mf-cabine-label-tracking);
+
+  --mf-type-caption-family:   var(--mf-cabine-caption-family);
+  --mf-type-caption-size:     var(--mf-cabine-caption-size);
+  --mf-type-caption-weight:   var(--mf-cabine-caption-weight);
+  --mf-type-caption-leading:  var(--mf-cabine-caption-leading);
+  --mf-type-caption-tracking: var(--mf-cabine-caption-tracking);
+
+  --mf-type-control-family:   var(--mf-cabine-control-family);
+  --mf-type-control-size:     var(--mf-cabine-control-size);
+  --mf-type-control-weight:   var(--mf-cabine-control-weight);
+  --mf-type-control-leading:  var(--mf-cabine-control-leading);
+  --mf-type-control-tracking: var(--mf-cabine-control-tracking);
+
+  --mf-control-height: var(--mf-cabine-control-height);
+  --mf-control-pad-x:  var(--mf-cabine-control-pad-x);
+}
+
+/* ---- md (768px): a escala sobe. Nunca desce. ---- */
+@media (min-width: 768px) {
+  :root {
+    --mf-gutter: var(--mf-space-raw-24);
+    --mf-vitrine-display-size: var(--mf-font-size-raw-64);
+    --mf-vitrine-title-size:   var(--mf-font-size-raw-40);
+    --mf-vitrine-heading-size: var(--mf-font-size-raw-28);
+    --mf-vitrine-subhead-size: var(--mf-font-size-raw-20);
+    --mf-vitrine-control-height: 56px;
+    --mf-cabine-body-size:    var(--mf-font-size-raw-14);
+    --mf-cabine-control-size: var(--mf-font-size-raw-14);
+    --mf-cabine-control-height: 36px;
+    --mf-cabine-control-pad-x: var(--mf-space-raw-12);
+  }
+}
+
+/* ---- lg (1024px) ---- */
+@media (min-width: 1024px) {
+  :root {
+    --mf-gutter: var(--mf-space-raw-48);
+  }
+}
+
+/* ---- Reduzir movimento: menos e mais suave, nao zero ---- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mf-motion-reveal:  var(--mf-duration-raw-200);
+    --mf-motion-ambient: var(--mf-duration-raw-300);
+    --mf-enter-scale:    1;
+  }
+}

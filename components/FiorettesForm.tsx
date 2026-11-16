@@ -81,7 +81,7 @@ export default function FiorettesForm() {
         style={{
           background: 'rgba(255,255,255,0.04)',
           border: '1px solid rgba(255,255,255,0.09)',
-          borderRadius: '12px',
+          borderRadius: 'var(--mf-radius-card)',
           backdropFilter: 'blur(20px) saturate(160%)',
           WebkitBackdropFilter: 'blur(20px) saturate(160%)',
           padding: '40px 24px',
@@ -94,7 +94,7 @@ export default function FiorettesForm() {
         >
           ela leu.
         </p>
-        <p style={{ color: '#7A4848', fontSize: '13px', fontWeight: 200, letterSpacing: '0.04em', lineHeight: 1.75, marginTop: '12px' }}>
+        <p style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '13px', fontWeight: 200, letterSpacing: '0.04em', lineHeight: 1.75, marginTop: '12px' }}>
           quando ela escolher preservar,<br />
           sua página entra no arquivo.
         </p>
@@ -103,23 +103,23 @@ export default function FiorettesForm() {
   }
 
   const borderFor = (field: Focused) =>
-    `1px solid ${focused === field ? '#CC2020' : '#2a1212'}`
+    `1px solid ${focused === field ? 'var(--mf-border-active)' : 'var(--mf-border-tarja)'}`
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Isca valor={isca} aoMudar={setIsca} />
 
-      {/* Card container — liquid glass */}
+      {/* Card container: liquid glass */}
       <div style={{
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.09)',
-        borderRadius: '12px',
+        borderRadius: 'var(--mf-radius-card)',
         backdropFilter: 'blur(20px) saturate(160%)',
         WebkitBackdropFilter: 'blur(20px) saturate(160%)',
         overflow: 'hidden',
       }}>
 
-        {/* Textarea — corpo do post */}
+        {/* Textarea: corpo do post */}
         <div style={{ padding: '20px 20px 0' }}>
           <textarea
             placeholder="o que você quer deixar?"
@@ -146,11 +146,11 @@ export default function FiorettesForm() {
             className="fiorettes-textarea"
           />
           {errors.historia && (
-            <p style={{ color: '#FF4444', fontSize: '12px', fontWeight: 200, marginTop: '4px' }}>
+            <p style={{ color: 'var(--mf-state-error)', fontSize: '12px', fontWeight: 200, marginTop: '4px' }}>
               {errors.historia}
             </p>
           )}
-          <p style={{ color: '#555555', fontSize: '11px', textAlign: 'right', marginTop: '4px', marginBottom: '12px' }}>
+          <p style={{ color: 'var(--mf-text-subtle)', fontSize: '12px', textAlign: 'right', marginTop: '4px', marginBottom: '12px' }}>
             {form.historia.length}/2000
           </p>
         </div>
@@ -158,7 +158,7 @@ export default function FiorettesForm() {
         {/* Separador */}
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
 
-        {/* Barra inferior — assinatura + cidade + título */}
+        {/* Barra inferior: assinatura + cidade + título */}
         <div style={{ padding: '12px 20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <input
             type="text"
@@ -210,7 +210,7 @@ export default function FiorettesForm() {
           />
           <input
             type="text"
-            placeholder="título — opcional"
+            placeholder="título (opcional)"
             value={form.titulo}
             onChange={e => set('titulo', e.target.value)}
             onFocus={() => setFocused('titulo')}
@@ -240,17 +240,17 @@ export default function FiorettesForm() {
       </div>
 
       {/* D4 line */}
-      <p style={{ color: '#7A4848', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em', textAlign: 'center', lineHeight: 1.7, margin: '16px 0' }}>
+      <p style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em', textAlign: 'center', lineHeight: 1.7, margin: '16px 0' }}>
         seu número já existe no arquivo. só está esperando a página.
       </p>
 
-      {/* Submit — Tarja CTA */}
+      {/* Submit: Tarja CTA */}
       <div className={`tarja-field${!loading ? ' tarja-btn-glow' : ''}`}>
-        <TarjaSvg fill={loading ? '#8B1515' : '#CC2020'} />
+        <TarjaSvg fill={loading ? 'var(--mf-accent-busy)' : 'var(--mf-accent)'} />
         <button
           type="submit"
           disabled={loading}
-          className="font-brand"
+          className="font-brand focus-ring"
           style={{
             position: 'absolute', inset: 0,
             width: '100%', height: '100%',
@@ -269,12 +269,12 @@ export default function FiorettesForm() {
       </div>
 
       {errors.server && (
-        <p style={{ color: '#FF4444', fontSize: '12px', fontWeight: 200, textAlign: 'center', marginTop: '8px' }}>
+        <p style={{ color: 'var(--mf-state-error)', fontSize: '12px', fontWeight: 200, textAlign: 'center', marginTop: '8px' }}>
           {errors.server}
         </p>
       )}
 
-      <p style={{ color: '#7A4848', fontSize: '11px', fontWeight: 200, letterSpacing: '0.04em', textAlign: 'center', lineHeight: 1.6, marginTop: '12px' }}>
+      <p style={{ color: 'var(--mf-color-mauve-lt)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.04em', textAlign: 'center', lineHeight: 1.6, marginTop: '12px' }}>
         ao entregar, autorizo que MELFIORE leia e preserve esta página
       </p>
 

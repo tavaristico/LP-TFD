@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Política de Privacidade — MELFIORE',
+  title: 'Política de Privacidade | MELFIORE',
   description: 'Como coletamos, usamos e protegemos seus dados pessoais.',
   robots: { index: false },
 }
@@ -13,7 +13,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
       fontWeight: 700,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: '#7A4848',
+      color: 'var(--mf-color-mauve-lt)',
       marginBottom: '16px',
     }}>
       {title}
@@ -50,7 +50,7 @@ export default function PrivacidadePage() {
             style={{
               display: 'inline-block',
               marginBottom: '48px',
-              color: '#555555',
+              color: 'var(--mf-text-subtle)',
               fontSize: '11px',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -70,7 +70,7 @@ export default function PrivacidadePage() {
           }}>
             Política de Privacidade
           </h1>
-          <p style={{ color: '#555555', fontSize: '12px', fontWeight: 200, letterSpacing: '0.06em' }}>
+          <p style={{ color: 'var(--mf-text-subtle)', fontSize: '12px', fontWeight: 200, letterSpacing: '0.06em' }}>
             Última atualização: novembro de 2026
           </p>
         </header>
@@ -80,11 +80,11 @@ export default function PrivacidadePage() {
           <p>
             O site <strong style={{ color: '#E8E8E8', fontWeight: 400 }}>melfiore.com</strong> é operado pela{' '}
             <strong style={{ color: '#E8E8E8', fontWeight: 400 }}>.TBF. inc</strong>, inscrita no CNPJ
-            61.360.565/0001-74, com sede na Rua Pamplona, 145, Jardim Paulista, São Paulo – SP, 01405-100.
+            61.360.565/0001-74, com sede na Rua Pamplona, 145, Jardim Paulista, São Paulo, SP, 01405-100.
           </p>
           <p style={{ marginTop: '12px' }}>
             Para questões relacionadas a dados pessoais, entre em contato pelo e-mail{' '}
-            <a href="mailto:privacidade@thebrfactory.com" style={{ color: '#7A4848' }}>
+            <a href="mailto:privacidade@thebrfactory.com" style={{ color: 'var(--mf-color-mauve-lt)' }}>
               privacidade@thebrfactory.com
             </a>
             .
@@ -103,7 +103,7 @@ export default function PrivacidadePage() {
             esses dados apenas para entrega, emissão de nota e atendimento. Não são vendidos nem usados
             para anúncio.
           </p>
-          <p style={{ marginTop: '16px' }}><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Fiorettes — o diário</strong></p>
+          <p style={{ marginTop: '16px' }}><strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Fiorettes: o diário</strong></p>
           <p>
             Ao enviar uma página ao Fiorettes, coletamos o texto da submissão, uma assinatura (que pode ser
             anônima) e, opcionalmente, a cidade. Nenhum dado de identificação obrigatório é coletado nesse
@@ -125,7 +125,7 @@ export default function PrivacidadePage() {
               'Melhorar a experiência do site com base em dados agregados de navegação',
             ].map((item, i) => (
               <li key={i} style={{ display: 'flex', gap: '12px' }}>
-                <span style={{ color: '#7A4848', flexShrink: 0 }}>—</span>
+                <span style={{ color: 'var(--mf-color-mauve-lt)', flexShrink: 0 }}>·</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -144,7 +144,7 @@ export default function PrivacidadePage() {
           </p>
           <p style={{ marginTop: '12px' }}>
             A hospedagem do site é realizada pela{' '}
-            <strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Vercel Inc.</strong>, localizada nos
+            <strong style={{ color: '#E8E8E8', fontWeight: 400 }}>Cloudflare, Inc.</strong>, localizada nos
             Estados Unidos, com servidores distribuídos globalmente.
           </p>
         </Section>
@@ -162,14 +162,14 @@ export default function PrivacidadePage() {
               'Revogar o consentimento a qualquer momento',
             ].map((item, i) => (
               <li key={i} style={{ display: 'flex', gap: '12px' }}>
-                <span style={{ color: '#7A4848', flexShrink: 0 }}>—</span>
+                <span style={{ color: 'var(--mf-color-mauve-lt)', flexShrink: 0 }}>·</span>
                 <span>{item}</span>
               </li>
             ))}
           </ul>
           <p style={{ marginTop: '16px' }}>
             Para exercer qualquer um desses direitos, entre em contato pelo e-mail{' '}
-            <a href="mailto:privacidade@thebrfactory.com" style={{ color: '#7A4848' }}>
+            <a href="mailto:privacidade@thebrfactory.com" style={{ color: 'var(--mf-color-mauve-lt)' }}>
               privacidade@thebrfactory.com
             </a>
             . Respondemos em até 15 dias úteis.
@@ -206,7 +206,7 @@ export default function PrivacidadePage() {
           marginTop: '16px',
           textAlign: 'center',
         }}>
-          <p style={{ color: '#444444', fontSize: '11px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.7 }}>
+          <p style={{ color: 'var(--mf-text-subtle)', fontSize: '11px', fontWeight: 200, letterSpacing: '0.06em', lineHeight: 1.7 }}>
             MELFIORE © 2026 .TBF. inc. Todos os direitos reservados.<br />
             .THE FIORE DAILY. intimacy wellness club .TBF.ORIGINAL LABEL
           </p>
