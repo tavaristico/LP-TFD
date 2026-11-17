@@ -5,7 +5,7 @@ import { TarjaSvg } from './TarjaSvg'
 import { ACEITE_WAITLIST } from '@/lib/aceite-waitlist'
 import { CAMPO_ISCA } from '@/lib/antirrobo'
 import { Isca, Turnstile } from './Antirrobo'
-import { celularPareceValido } from '@/lib/celular-br'
+import { celularPareceValido, mascararCelular } from '@/lib/celular-br'
 
 type FormState  = { name: string; email: string; whatsapp: string }
 type FormErrors = { name?: string; email?: string; whatsapp?: string; server?: string }
@@ -136,9 +136,9 @@ export default function WaitlistForm() {
             type="tel"
             id="waitlist-whatsapp"
             aria-label="Seu WhatsApp (opcional)"
-            placeholder="e seu whatsapp? (se quiser)"
+            placeholder={focused === 'whatsapp' ? '+55 (__) _____-____' : 'e seu whatsapp? (se quiser)'}
             value={form.whatsapp}
-            onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
+            onChange={e => setForm(f => ({ ...f, whatsapp: mascararCelular(e.target.value) }))}
             onFocus={() => setFocused('whatsapp')}
             onBlur={() => setFocused(null)}
             className="tarja-input font-brand"
