@@ -70,6 +70,14 @@
     }
   }
 
+  /* Campos mais proximos (fundador, 17/11): a tarja visivel ocupa ~1/3 da altura do campo,
+     o resto e respiro transparente do SVG. Puxar os campos de digitar uns para os outros,
+     sem afinar a tarja. O CTA fica onde esta. */
+  @media (min-width: 640px) {
+    .form-tarjas > .flex-col + .flex-col { margin-top: -18px; }
+    .form-tarjas > .flex-col + .tarja-field { margin-top: -8px; }
+  }
+
   /* ─── Tarja em 3 fatias (design system, D11): a ponta arredondada nao distorce, so o miolo estica ─── */
 
   .tarja-forma {
@@ -151,6 +159,7 @@
     border: none;
     outline: none;
     padding: 0 18px;
+    text-align: center;
     color: #E8E8E8;
     font-size: 0.9rem;
     font-weight: 300;

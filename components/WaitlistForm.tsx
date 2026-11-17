@@ -69,7 +69,7 @@ export default function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-2 sm:gap-3">
+    <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-2 sm:gap-3 form-tarjas">
       <Isca valor={isca} aoMudar={setIsca} />
 
       {/* Nome */}
@@ -94,7 +94,7 @@ export default function WaitlistForm() {
           />
         </div>
         {errors.name && (
-          <span className="text-xs font-light text-brand-error pl-1">{errors.name}</span>
+          <span className="text-xs font-light text-brand-error text-center">{errors.name}</span>
         )}
       </div>
 
@@ -121,7 +121,7 @@ export default function WaitlistForm() {
           />
         </div>
         {errors.email && (
-          <span className="text-xs font-light text-brand-error pl-1">{errors.email}</span>
+          <span className="text-xs font-light text-brand-error text-center">{errors.email}</span>
         )}
       </div>
 
@@ -148,7 +148,7 @@ export default function WaitlistForm() {
           />
         </div>
         {errors.whatsapp && (
-          <span className="text-xs font-light text-brand-error pl-1">{errors.whatsapp}</span>
+          <span className="text-xs font-light text-brand-error text-center">{errors.whatsapp}</span>
         )}
       </div>
 
@@ -191,7 +191,7 @@ export default function WaitlistForm() {
       {/* Aceite (prova gravada em lib/aceite-waitlist.ts) */}
       <p
         className="text-center"
-        style={{ color: 'var(--mf-text-tier-label)', fontSize: '12px', fontWeight: 300, letterSpacing: '0.04em', lineHeight: 1.5 }}
+        style={{ color: 'var(--mf-text-tier-caption)', fontSize: '11px', fontWeight: 300, letterSpacing: '0.03em', lineHeight: 1.5, maxWidth: '22rem', marginInline: 'auto', opacity: 0.85 }}
       >
         {ACEITE_WAITLIST.texto}
       </p>
