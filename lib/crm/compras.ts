@@ -80,6 +80,7 @@ const RE_NUMERO = /^[A-Za-z0-9_.-]{1,40}$/
 const MAX_ITENS = 100
 
 /** Nome de campo que a compra nao aceita em nenhuma profundidade. Comparacao sem caixa e sem acento. */
+// regra-cartao: lista de recusa (S13): estes nomes sao RECUSADOS, nunca lidos
 const PROIBIDOS = new Set([
   'cnpj', 'rg', 'cartao', 'card', 'cvv', 'pan', 'senha', 'password', 'consentimento', 'consentimentos',
 ])
