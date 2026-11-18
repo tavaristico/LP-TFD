@@ -5,6 +5,12 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 18/11/2026: campos com 16px (nada publicado)
+
+- `app/globals.css` (`.tarja-input`) e `components/FiorettesForm.tsx` (3 inputs da barra inferior): `font-size` 16px. Abaixo disso o Safari do iPhone e o navegador do Instagram dao zoom ao tocar no campo. So o tamanho da fonte mudou.
+
+---
+
 ## 18/11/2026: aceite enxuto e celular com espacos (nada publicado)
 
 - `lib/aceite-waitlist.ts`: versao `waitlist-2026-11-18`, sem compra e sem cpf.
