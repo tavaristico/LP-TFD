@@ -5,6 +5,14 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 18/11/2026: aceite enxuto e celular com espacos (nada publicado)
+
+- `lib/aceite-waitlist.ts`: versao `waitlist-2026-11-18`, sem compra e sem cpf.
+- `lib/celular-br.ts`: `+55 11 98765 4321`, so espacos, que entram conforme digita. Validacao e E.164 do servidor intactos.
+- `components/WaitlistForm.tsx`: placeholder fixo, sem molde no foco. Testes e `COPY.md` atualizados.
+
+---
+
 ## 16/11/2026: tokens do design system no site (nada publicado)
 
 - `app/tokens.melfiore.css` (novo): copia de `DESIGN-SYSTEM/dist/lp-tfd` (feat/decisoes-16-11, 5d42ed0) sem os `@font-face`; a fonte segue self-hosted no `layout.tsx`. Entra por `import` no `layout.tsx`. O consumidor `lp-tfd` do sync segue `enabled:false`.

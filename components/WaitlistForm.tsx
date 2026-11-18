@@ -136,7 +136,7 @@ export default function WaitlistForm() {
             type="tel"
             id="waitlist-whatsapp"
             aria-label="Seu WhatsApp (opcional)"
-            placeholder={focused === 'whatsapp' ? '+55 (__) _____-____' : 'e seu whatsapp? (se quiser)'}
+            placeholder="e seu whatsapp? (se quiser)"
             value={form.whatsapp}
             onChange={e => setForm(f => ({ ...f, whatsapp: mascararCelular(e.target.value) }))}
             onFocus={() => setFocused('whatsapp')}

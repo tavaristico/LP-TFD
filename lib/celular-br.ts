@@ -11,15 +11,15 @@ export function celularPareceValido(bruto: string): boolean {
   return /^[1-9][1-9]9\d{8}$/.test(d)
 }
 
-/** Mascara enquanto digita: +55 (11) 98765-4321. So poe o separador quando o digito seguinte existe,
+/** Mascara enquanto digita: +55 11 98765 4321. So poe o separador quando o digito seguinte existe,
  *  entao apagar funciona sem travar. Aceita colar com ou sem +55. Saida passa em celularPareceValido. */
 export function mascararCelular(bruto: string): string {
   let d = bruto.replace(/\D/g, '')
   if (d.startsWith('55') && (bruto.trim().startsWith('+') || d.length > 11)) d = d.slice(2)
   d = d.slice(0, 11)
   if (d === '') return ''
-  let s = '+55 (' + d.slice(0, 2)
-  if (d.length > 2) s += ') ' + d.slice(2, 7)
-  if (d.length > 7) s += '-' + d.slice(7)
+  let s = '+55 ' + d.slice(0, 2)
+  if (d.length > 2) s += ' ' + d.slice(2, 7)
+  if (d.length > 7) s += ' ' + d.slice(7)
   return s
 }
