@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={brother1816.variable}>
-      <body className="font-brand bg-brand-bg min-h-screen">
+      <body className="font-brand bg-brand-bg">
         <TarjaDefs />
         {children}
         {GA4_ATIVO && (

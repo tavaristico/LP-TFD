@@ -9,15 +9,24 @@
     padding: 0;
   }
 
+  /* Rolagem liberada na raiz (25/11/2026): overflow hidden aqui travava toda rota de texto
+     (/privacidade, /termos, /exclusao-de-dados). A landing e a /fiorettes ja fecham a propria
+     altura em 100dvh, entao nao rolam. */
   html,
   body {
-    height: 100%;
     background-color: #000000;
     color: #E8E8E8;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow: hidden;
     overscroll-behavior: none;
+  }
+
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
   }
 
   ::selection {

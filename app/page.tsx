@@ -105,7 +105,7 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <footer
-        className="relative flex items-center justify-center anim-fade-in delay-650"
+        className="relative flex flex-col items-center justify-center anim-fade-in delay-650"
         style={{ zIndex: 3, background: 'transparent', padding: '8px 24px calc(12px + env(safe-area-inset-bottom, 0px))' }}
       >
         <p
@@ -124,6 +124,21 @@ export default function Home() {
           .THE FIORE DAILY. intimacy wellness club .TBF.ORIGINAL LABEL<br />
           RUA PAMPLONA, 145, JARDIM PAULISTA, SÃO PAULO, SP, 01.405-900</span>
         </p>
+        <nav
+          aria-label="documentos"
+          className="flex flex-wrap justify-center lg:absolute lg:right-6 lg:bottom-[calc(12px+env(safe-area-inset-bottom,0px))]"
+          style={{ gap: '0 18px' }}
+        >
+          {[
+            ['/privacidade', 'privacidade'],
+            ['/termos', 'termos'],
+            ['/exclusao-de-dados', 'exclusão de dados'],
+          ].map(([href, texto]) => (
+            <a key={href} href={href} style={{ color: 'var(--mf-text-footer)', fontSize: '12px', fontWeight: 300, letterSpacing: '0.07em', textDecoration: 'none', padding: '6px 0' }} className="lg:py-0">
+              {texto}
+            </a>
+          ))}
+        </nav>
       </footer>
 
     </div>

@@ -5,6 +5,17 @@ Branch de referência: `main` = produção · `develop` = trabalho em andamento
 
 ---
 
+## 25/11/2026: rolagem das paginas de texto e paginas legais (nada publicado)
+
+- Bug: `/privacidade` nao rolava (print do fundador, 25/11). Causa: `app/globals.css` fixava `html, body { height: 100%; overflow: hidden }` para a home, e valia para toda rota. Correcao: sem `overflow` e sem `height: 100%` na raiz; `body` com `min-height: 100dvh` (em `globals.css`, e `min-h-screen` saiu do `layout.tsx`). A home (`100dvh` e `overflow: hidden` proprios) e a `/fiorettes` (rolagem propria) seguem sem rolar a pagina.
+- `components/PaginaLegal.tsx` (novo): casca das paginas legais (Section, Lista, rodape com os tres links). `app/privacidade/page.tsx` passa a usar.
+- `/termos` e `/exclusao-de-dados` (novas, caminhos fixos para o formulario do app da Meta). `sitemap.ts` lista as duas.
+- `/privacidade`: secao 4 atendimento por WhatsApp, cookies na frase do fundador de 24/11, links para as duas paginas novas, data 25 de novembro de 2026. Rascunho para o advogado (L1).
+- `app/page.tsx`: tres links no rodape da home (lg: canto direito, sem aumentar a altura; abaixo de lg: linha propria). `COPY.md` 1.11.
+- Teste de rolagem (roda, End, toque): `/privacidade` 390 e 1440 rolam depois, nao rolavam antes. Home e `/fiorettes` seguem em 844 e 900.
+
+---
+
 ## 18/11/2026: campos com 16px (nada publicado)
 
 - `app/globals.css` (`.tarja-input`) e `components/FiorettesForm.tsx` (3 inputs da barra inferior): `font-size` 16px. Abaixo disso o Safari do iPhone e o navegador do Instagram dao zoom ao tocar no campo. So o tamanho da fonte mudou.
